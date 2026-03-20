@@ -15,10 +15,10 @@ JUMP_BUFFER_TIME = 0.3
 MAX_FALL_SPEED = 1600.0
 FALL_GRAVITY_MULTIPLIER = 3.0
 RECOIL_SPEED = 700.0
-RECOIL_DURATION = 0.6
 
 [node name="Camera2D" type="Camera2D" parent="Player" unique_id=1415058490]
 position_smoothing_enabled = true
+position_smoothing_speed = 0.0
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=190886717]
 position = Vector2(6, 268)

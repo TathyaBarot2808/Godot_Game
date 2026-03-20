@@ -3,6 +3,10 @@ extends CharacterBody2D
 @export_group("Movement")
 @export var SPEED: float = 600.0
 @export var JUMP_VELOCITY: float = -1000.0
+@export var ACCELERATION: float = 3000.0
+@export var DECELERATION: float = 2500.0
+@export var AIR_ACCELERATION: float = 1800.0
+@export var AIR_DECELERATION: float = 800.0
 
 @export_group("Advanced Jump Mechanics")
 @export var BASE_GRAVITY_MULTIPLIER: float = 1.5
@@ -23,10 +27,12 @@ extends CharacterBody2D
 @export_group("Shotgun Recoil")
 @export var RECOIL_SPEED: float = 1500.0
 @export var RECOIL_DURATION: float = 0.2
+@export var RECOIL_GRAVITY_RECOVERY: float = 0.15
 
 var jump_buffer_timer: float = 0.0
 var coyote_timer: float = 0.0
 var recoil_timer: float = 0.0
+var recoil_recovery_timer: float = 0.0
 
 @onready var left_raycast: RayCast2D = $RayCastLeft
 @onready var right_raycast: RayCast2D = $RayCastRight
@@ -44,13 +50,19 @@ func _physics_process(delta: float) -> void:
 		
 	if recoil_timer > 0:
 		recoil_timer -= delta
+		# When recoil just ended, start the gravity recovery ramp
+		if recoil_timer <= 0:
+			recoil_recovery_timer = RECOIL_GRAVITY_RECOVERY
+	
+	if recoil_recovery_timer > 0:
+		recoil_recovery_timer -= delta
 	
 	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
 	var current_speed := SPEED
 	
 	if not is_on_floor():
 		if recoil_timer <= 0:
-			# Only apply gravity and jump mechanics when NOT in recoil
+			# Only apply gravity and jump mechanics when NOT in active recoil
 			if Input.is_action_just_released("jump") and velocity.y < 0:
 				velocity.y *= VARIABLE_JUMP_MULTIPLIER
 				
@@ -59,9 +71,14 @@ func _physics_process(delta: float) -> void:
 				current_speed += APEX_SPEED_BOOST
 			elif velocity.y > 0:
 				current_gravity *= FALL_GRAVITY_MULTIPLIER
+			
+			# Ramp gravity back gradually after recoil ends
+			if recoil_recovery_timer > 0:
+				var recovery_factor := 1.0 - (recoil_recovery_timer / RECOIL_GRAVITY_RECOVERY)
+				current_gravity *= recovery_factor
 				
 			velocity += current_gravity * delta
-		# During recoil: no gravity applied, let the full impulse carry the player
+		# During active recoil: no gravity applied, full impulse carries the player
 
 		if velocity.y > MAX_FALL_SPEED:
 			velocity.y = MAX_FALL_SPEED
@@ -78,6 +95,7 @@ func _physics_process(delta: float) -> void:
 			
 		velocity = recoil_dir * RECOIL_SPEED
 		recoil_timer = RECOIL_DURATION
+		recoil_recovery_timer = 0.0
 
 	if jump_buffer_timer > 0 and coyote_timer > 0:
 		velocity.y = JUMP_VELOCITY
@@ -85,23 +103,16 @@ func _physics_process(delta: float) -> void:
 		coyote_timer = 0.0
 
 	var direction := Input.get_axis("move_left", "move_right")
+	var on_ground := is_on_floor()
 	
 	if recoil_timer <= 0:
 		if direction:
 			var target_speed := direction * current_speed
-			# If faster than normal speed, gently decelerate to standard speed
-			if abs(velocity.x) > current_speed and sign(velocity.x) == sign(direction):
-				velocity.x = move_toward(velocity.x, target_speed, current_speed * 1.5 * delta)
-			else:
-				# Normal snappy acceleration
-				velocity.x = move_toward(velocity.x, target_speed, current_speed * 10.0 * delta)
+			var accel := ACCELERATION if on_ground else AIR_ACCELERATION
+			velocity.x = move_toward(velocity.x, target_speed, accel * delta)
 		else:
-			if abs(velocity.x) > current_speed:
-				# Smooth deceleration if sliding from recoil
-				velocity.x = move_toward(velocity.x, 0, current_speed * 1.5 * delta)
-			else:
-				# Snappy stop if walking normally
-				velocity.x = move_toward(velocity.x, 0, current_speed * 10.0 * delta)
+			var decel := DECELERATION if on_ground else AIR_DECELERATION
+			velocity.x = move_toward(velocity.x, 0, decel * delta)
 
 	move_and_slide()
 
