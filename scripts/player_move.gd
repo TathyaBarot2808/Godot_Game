@@ -44,7 +44,32 @@ func _physics_process(delta: float) -> void:
 		
 	if recoil_timer > 0:
 		recoil_timer -= delta
-		
+	
+	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
+	var current_speed := SPEED
+	
+	if not is_on_floor():
+		if recoil_timer <= 0:
+			# Only apply gravity and jump mechanics when NOT in recoil
+			if Input.is_action_just_released("jump") and velocity.y < 0:
+				velocity.y *= VARIABLE_JUMP_MULTIPLIER
+				
+			if abs(velocity.y) < APEX_THRESHOLD:
+				current_gravity *= APEX_GRAVITY_MULTIPLIER
+				current_speed += APEX_SPEED_BOOST
+			elif velocity.y > 0:
+				current_gravity *= FALL_GRAVITY_MULTIPLIER
+				
+			velocity += current_gravity * delta
+		# During recoil: no gravity applied, let the full impulse carry the player
+
+		if velocity.y > MAX_FALL_SPEED:
+			velocity.y = MAX_FALL_SPEED
+
+		if velocity.y < 0 and is_on_ceiling():
+			_handle_corner_correction()
+	
+	# Apply recoil AFTER gravity so the impulse isn't partially consumed on the trigger frame
 	if Input.is_action_just_pressed("shoot"):
 		var mouse_pos = get_global_mouse_position()
 		var recoil_dir = (global_position - mouse_pos).normalized()
@@ -53,27 +78,6 @@ func _physics_process(delta: float) -> void:
 			
 		velocity = recoil_dir * RECOIL_SPEED
 		recoil_timer = RECOIL_DURATION
-	
-	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
-	var current_speed := SPEED
-	
-	if not is_on_floor():
-		if Input.is_action_just_released("jump") and velocity.y < 0:
-			velocity.y *= VARIABLE_JUMP_MULTIPLIER
-			
-		if abs(velocity.y) < APEX_THRESHOLD:
-			current_gravity *= APEX_GRAVITY_MULTIPLIER
-			current_speed += APEX_SPEED_BOOST
-		elif velocity.y > 0:
-			current_gravity *= FALL_GRAVITY_MULTIPLIER
-			
-		velocity += current_gravity * delta
-
-		if velocity.y > MAX_FALL_SPEED:
-			velocity.y = MAX_FALL_SPEED
-
-		if velocity.y < 0 and is_on_ceiling():
-			_handle_corner_correction()
 
 	if jump_buffer_timer > 0 and coyote_timer > 0:
 		velocity.y = JUMP_VELOCITY
