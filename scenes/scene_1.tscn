@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://dw0dd3rtp5un5"]
+
+[ext_resource type="PackedScene" uid="uid://c5kvuyd7wo1w7" path="res://scenes/player.tscn" id="1_ta4h7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ta4h7"]
+size = Vector2(2567.13, 200)
+
+[sub_resource type="QuadMesh" id="QuadMesh_ta4h7"]
+
+[node name="Scene1" type="Node2D" unique_id=830306056]
+
+[node name="Player" parent="." unique_id=167515670 instance=ExtResource("1_ta4h7")]
+JUMP_VELOCITY = -800.0
+JUMP_BUFFER_TIME = 0.3
+MAX_FALL_SPEED = 1600.0
+FALL_GRAVITY_MULTIPLIER = 3.0
+RECOIL_SPEED = 10.0
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1415058490]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=190886717]
+position = Vector2(6, 268)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1420315667]
+position = Vector2(-3.5, 89.437744)
+shape = SubResource("RectangleShape2D_ta4h7")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D/CollisionShape2D" unique_id=887333113]
+position = Vector2(-2.5, 18.562256)
+scale = Vector2(-2593.8584, 231.6636)
+mesh = SubResource("QuadMesh_ta4h7")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="." unique_id=1604692071]
+position = Vector2(-733, 134)
+scale = Vector2(0.31961235, 0.2973811)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2" unique_id=600773211]
+position = Vector2(193.98523, -116.69925)
+shape = SubResource("RectangleShape2D_ta4h7")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D2/CollisionShape2D" unique_id=265010190]
+position = Vector2(-6.257822, -4.357506)
+scale = Vector2(-2593.8584, 231.6636)
+mesh = SubResource("QuadMesh_ta4h7")
+
+[node name="RayCastRight" type="RayCast2D" parent="StaticBody2D2/CollisionShape2D" unique_id=1842721491]
+position = Vector2(1279.6749, 89.79773)
+target_position = Vector2(-3.1287231, 3.362671)
