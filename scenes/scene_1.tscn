@@ -156,6 +156,7 @@ sources/0 = SubResource("TileSetAtlasSource_cn2eb")
 [node name="Scene1" type="Node2D" unique_id=830306056]
 
 [node name="Player" parent="." unique_id=167515670 instance=ExtResource("1_ta4h7")]
+position = Vector2(1, 69)
 JUMP_VELOCITY = -800.0
 JUMP_BUFFER_TIME = 0.3
 MAX_FALL_SPEED = 1600.0
