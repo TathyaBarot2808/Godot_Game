@@ -1,3 +1,6 @@
+# IDE / Editor settings
+.vscode/
+
 # Godot 4+ specific ignores
 .godot/
 .nomedia

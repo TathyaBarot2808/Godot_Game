@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://c8wvjnp6dx5al"]
+
+[ext_resource type="Script" uid="uid://bvo2e0him6yo0" path="res://scripts/hud.gd" id="1_hud"]
+
+[node name="HUD" type="CanvasLayer" unique_id=995766151]
+script = ExtResource("1_hud")
+
+[node name="ManaContainer" type="Control" parent="." unique_id=1037064564]
+custom_minimum_size = Vector2(220, 60)
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -80.0
+offset_right = 240.0
+offset_bottom = -20.0
+
+[node name="ManaBar" type="ProgressBar" parent="ManaContainer" unique_id=1645879893]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 35.0
+offset_bottom = 62.0
+grow_horizontal = 2
+step = 1.0
+value = 100.0
+show_percentage = false
+
+[node name="ManaLabel" type="Label" parent="ManaContainer" unique_id=1846120490]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 30.0
+grow_horizontal = 2
+text = "Mana: 100 / 100"
+vertical_alignment = 1

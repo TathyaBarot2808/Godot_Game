@@ -1,10 +1,12 @@
 [gd_scene format=4 uid="uid://dw0dd3rtp5un5"]
 
-[ext_resource type="PackedScene" uid="uid://c5kvuyd7wo1w7" path="res://scenes/player.tscn" id="1_ta4h7"]
-[ext_resource type="Texture2D" uid="uid://liy58p781tw7" path="res://assets/Dungeon Tile Set.png" id="2_ka884"]
+[ext_resource type="PackedScene" uid="uid://c5kvuyd7wo1w7" path="res://scenes/player_sc.tscn" id="1_4cm2f"]
+[ext_resource type="Texture2D" uid="uid://liy58p781tw7" path="res://assets/Dungeon Tile Set.png" id="2_iynk6"]
+[ext_resource type="PackedScene" uid="uid://c8wvjnp6dx5al" path="res://scenes/hud.tscn" id="3_hud"]
+[ext_resource type="Script" uid="uid://db0ibg2vxor83" path="res://scripts/game.gd" id="4_game"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cn2eb"]
-texture = ExtResource("2_ka884")
+texture = ExtResource("2_iynk6")
 1:1/0 = 0
 1:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 2:1/0 = 0
@@ -154,14 +156,14 @@ physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_cn2eb")
 
 [node name="Scene1" type="Node2D" unique_id=830306056]
+script = ExtResource("4_game")
 
-[node name="Player" parent="." unique_id=167515670 instance=ExtResource("1_ta4h7")]
+[node name="Player" parent="." unique_id=167515670 instance=ExtResource("1_4cm2f")]
 position = Vector2(1, 69)
 JUMP_VELOCITY = -800.0
 JUMP_BUFFER_TIME = 0.3
 MAX_FALL_SPEED = 1600.0
 FALL_GRAVITY_MULTIPLIER = 3.0
-RECOIL_SPEED = 900.0
 
 [node name="Camera2D" type="Camera2D" parent="Player" unique_id=1415058490]
 scale = Vector2(76.35171, 1.7891371)
@@ -172,3 +174,5 @@ position_smoothing_enabled = true
 scale = Vector2(4, 4)
 tile_map_data = PackedByteArray("AAD3/wQAAAABAAEAAAD4/wQAAAACAAEAAAD5/wQAAAACAAEAAAD6/wQAAAACAAEAAAD7/wQAAAACAAEAAAD8/wQAAAAFAAIAAAD8/wMAAAABAAEAAAD9/wMAAAACAAEAAAD+/wMAAAACAAEAAAD//wMAAAACAAEAAAAAAAMAAAAFAAIAAAAAAAIAAAABAAEAAAABAAIAAAACAAEAAAACAAIAAAACAAEAAAADAAIAAAACAAEAAAAFAAIAAAACAAEAAAAGAAIAAAADAAEAAAD4/wUAAAAFAAIAAAD5/wUAAAACAAIAAAD6/wUAAAACAAIAAAD7/wUAAAAJAAIAAAD8/wUAAAAGAAYAAAD9/wQAAAAKAAcAAAD+/wQAAAACAAIAAAD//wQAAAAMAAYAAAAAAAQAAAACAAIAAAABAAMAAAAIAAYAAAACAAMAAAAJAAYAAAADAAMAAAACAAIAAAAFAAMAAAANAAEAAAD3/wUAAAABAAIAAAD3/wYAAAABAAIAAAAGAAMAAAADAAIAAAAGAAQAAAADAAIAAAAGAAUAAAADAAIAAAAGAAYAAAADAAIAAAD3/wcAAAABAAMAAAAGAAcAAAADAAMAAAD4/wcAAAACAAMAAAD5/wcAAAACAAMAAAD6/wcAAAACAAMAAAD7/wcAAAACAAMAAAD8/wcAAAACAAMAAAD9/wcAAAACAAMAAAD+/wcAAAACAAMAAAD//wcAAAACAAMAAAAAAAcAAAACAAMAAAABAAcAAAACAAMAAAACAAcAAAACAAMAAAADAAcAAAACAAMAAAAEAAcAAAACAAMAAAAFAAcAAAACAAMAAAD4/wYAAAAFAAMAAAD5/wYAAAACAAIAAAD6/wYAAAALAAYAAAD7/wYAAAACAAIAAAD8/wYAAAACAAIAAAD9/wYAAAAIAAMAAAD9/wUAAAAKAAMAAAD+/wUAAAALAAMAAAD+/wYAAAAJAAMAAAD//wYAAAACAAIAAAD//wUAAAAGAAcAAAAAAAUAAAAMAAYAAAABAAYAAAAIAAcAAAABAAUAAAAKAAQAAAAAAAYAAAAGAAcAAAACAAQAAAALAAMAAAACAAUAAAALAAQAAAABAAQAAAAKAAMAAAADAAQAAAAJAAUAAAAEAAQAAAACAAIAAAAFAAQAAAACAAIAAAAFAAUAAAACAAIAAAAEAAUAAAACAAIAAAAEAAYAAAAMAAcAAAADAAYAAAACAAIAAAACAAYAAAAJAAcAAAADAAUAAAACAAIAAAAFAAYAAAANAAIAAAAEAAIAAAACAAEAAAAEAAMAAAAJAAUAAAA=")
 tile_set = SubResource("TileSet_sj5te")
+
+[node name="HUD" parent="." unique_id=496745851 instance=ExtResource("3_hud")]

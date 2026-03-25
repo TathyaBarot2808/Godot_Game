@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://cip461irxrac7" path="res://scripts/player_move.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://h6cpc4whnlhr" path="res://assets/Player_Sprite.png" id="2_g2els"]
+[ext_resource type="PackedScene" uid="uid://ng0hy5sgafi4" path="res://scenes/mana_sc.tscn" id="3_mana"]
+[ext_resource type="Script" uid="uid://cjkt10dyt51sx" path="res://scripts/recoil_component.gd" id="4_recoil"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(35, 101.75)
@@ -16,3 +18,18 @@ texture = ExtResource("2_g2els")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=928330627]
 position = Vector2(17.5, 1.875)
 shape = SubResource("RectangleShape2D_g2els")
+
+[node name="RayCastLeft" type="RayCast2D" parent="." unique_id=582561956]
+position = Vector2(16.895, 0)
+rotation = 4.712389
+scale = Vector2(1.5, 1.5)
+
+[node name="RayCastRight" type="RayCast2D" parent="." unique_id=1237382877]
+position = Vector2(16.895, 0)
+rotation = 1.5707964
+scale = Vector2(1.5, 1.5)
+
+[node name="Mana" parent="." unique_id=236815105 instance=ExtResource("3_mana")]
+
+[node name="RecoilComponent" type="Node" parent="." unique_id=152948713]
+script = ExtResource("4_recoil")
