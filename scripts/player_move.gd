@@ -16,6 +16,11 @@ extends CharacterBody2D
 @export var MAX_FALL_SPEED: float = 2000.0
 @export var FALL_GRAVITY_MULTIPLIER: float = 5
 
+@export_group("Dash")
+@export var DASH_SPEED: float = 1800.0
+@export var DASH_DURATION: float = 0.12
+@export var DASH_COOLDOWN: float = 0.5
+
 @export_group("Apex Modifiers")
 @export var APEX_THRESHOLD: float = 15.0
 @export var APEX_GRAVITY_MULTIPLIER: float = 0.6
@@ -24,18 +29,16 @@ extends CharacterBody2D
 @export_group("Corner Correction")
 @export var CORNER_CORRECTION_AMOUNT: float = 4.0
 
-@export_group("Shotgun Recoil")
-@export var RECOIL_SPEED: float = 1500.0
-@export var RECOIL_DURATION: float = 0.2
-@export var RECOIL_GRAVITY_RECOVERY: float = 0.15
-
 var jump_buffer_timer: float = 0.0
 var coyote_timer: float = 0.0
-var recoil_timer: float = 0.0
-var recoil_recovery_timer: float = 0.0
+var dash_timer: float = 0.0
+var dash_cooldown_timer: float = 0.0
+var dash_direction: float = 0.0
+var is_dashing: bool = false
 
 @onready var left_raycast: RayCast2D = $RayCastLeft
 @onready var right_raycast: RayCast2D = $RayCastRight
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 func _physics_process(delta: float) -> void:
 	if is_on_floor():
@@ -47,55 +50,46 @@ func _physics_process(delta: float) -> void:
 		jump_buffer_timer = JUMP_BUFFER_TIME
 	else:
 		jump_buffer_timer -= delta
-		
-	if recoil_timer > 0:
-		recoil_timer -= delta
-		# When recoil just ended, start the gravity recovery ramp
-		if recoil_timer <= 0:
-			recoil_recovery_timer = RECOIL_GRAVITY_RECOVERY
 	
-	if recoil_recovery_timer > 0:
-		recoil_recovery_timer -= delta
+	if dash_cooldown_timer > 0:
+		dash_cooldown_timer -= delta
+	
+	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0:
+		var dir := Input.get_axis("move_left", "move_right")
+		if dir == 0:
+			dir = -1.0 if animated_sprite.flip_h else 1.0
+		dash_direction = sign(dir)
+		dash_timer = DASH_DURATION
+		dash_cooldown_timer = DASH_COOLDOWN
+		is_dashing = true
+		velocity.y = 0.0
+		velocity.x = dash_direction * DASH_SPEED
+	
+	if is_dashing:
+		dash_timer -= delta
+		if dash_timer <= 0:
+			is_dashing = false
 	
 	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
 	var current_speed := SPEED
 	
-	if not is_on_floor():
-		if recoil_timer <= 0:
-			# Only apply gravity and jump mechanics when NOT in active recoil
-			if Input.is_action_just_released("jump") and velocity.y < 0:
-				velocity.y *= VARIABLE_JUMP_MULTIPLIER
-				
-			if abs(velocity.y) < APEX_THRESHOLD:
-				current_gravity *= APEX_GRAVITY_MULTIPLIER
-				current_speed += APEX_SPEED_BOOST
-			elif velocity.y > 0:
-				current_gravity *= FALL_GRAVITY_MULTIPLIER
+	if not is_on_floor() and not is_dashing:
+		if Input.is_action_just_released("jump") and velocity.y < 0:
+			velocity.y *= VARIABLE_JUMP_MULTIPLIER
 			
-			# Ramp gravity back gradually after recoil ends
-			if recoil_recovery_timer > 0:
-				var recovery_factor := 1.0 - (recoil_recovery_timer / RECOIL_GRAVITY_RECOVERY)
-				current_gravity *= recovery_factor
-				
-			velocity += current_gravity * delta
-		# During active recoil: no gravity applied, full impulse carries the player
+		if abs(velocity.y) < APEX_THRESHOLD:
+			current_gravity *= APEX_GRAVITY_MULTIPLIER
+			current_speed += APEX_SPEED_BOOST
+		elif velocity.y > 0:
+			current_gravity *= FALL_GRAVITY_MULTIPLIER
+			
+		velocity += current_gravity * delta
 
 		if velocity.y > MAX_FALL_SPEED:
 			velocity.y = MAX_FALL_SPEED
 
 		if velocity.y < 0 and is_on_ceiling():
 			_handle_corner_correction()
-	
-	# Apply recoil AFTER gravity so the impulse isn't partially consumed on the trigger frame
-	if Input.is_action_just_pressed("shoot"):
-		var mouse_pos = get_global_mouse_position()
-		var recoil_dir = (global_position - mouse_pos).normalized()
-		if recoil_dir == Vector2.ZERO:
-			recoil_dir = Vector2.UP
-			
-		velocity = recoil_dir * RECOIL_SPEED
-		recoil_timer = RECOIL_DURATION
-		recoil_recovery_timer = 0.0
 
 	if jump_buffer_timer > 0 and coyote_timer > 0:
 		velocity.y = JUMP_VELOCITY
@@ -105,7 +99,28 @@ func _physics_process(delta: float) -> void:
 	var direction := Input.get_axis("move_left", "move_right")
 	var on_ground := is_on_floor()
 	
-	if recoil_timer <= 0:
+	# Animation & sprite flip
+	if direction != 0:
+		animated_sprite.flip_h = direction < 0
+	
+	if is_dashing or (animated_sprite.animation == "Dash" and animated_sprite.is_playing()):
+		if animated_sprite.animation != "Dash":
+			animated_sprite.play("Dash")
+	elif not on_ground:
+		if velocity.y < 0:
+			if animated_sprite.animation != "Jump":
+				animated_sprite.play("Jump")
+		elif velocity.y > 0:
+			if animated_sprite.animation != "Fall":
+				animated_sprite.play("Fall")
+	elif direction != 0:
+		if animated_sprite.animation != "Walk":
+			animated_sprite.play("Walk")
+	else:
+		if animated_sprite.animation != "Idle":
+			animated_sprite.play("Idle")
+	
+	if not is_dashing:
 		if direction:
 			var target_speed := direction * current_speed
 			var accel := ACCELERATION if on_ground else AIR_ACCELERATION
