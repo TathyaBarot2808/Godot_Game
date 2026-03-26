@@ -1,0 +1,142 @@
+[gd_scene format=3 uid="uid://b77p8ccb8vle3"]
+
+[ext_resource type="Script" uid="uid://bu6pwqmvqslul" path="res://scripts/player_projectile.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dvtq2rt5yypwc" path="res://assets/Player_Projectile_Sprite.png" id="1_xshyn"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_umcbn"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kfeqt"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8brw0"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wq7w0"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u572c"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_net65"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hrhsd"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ac1aw"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(224, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ypyp8"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(256, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ku8wa"]
+atlas = ExtResource("1_xshyn")
+region = Rect2(288, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qfl01"]
+animations = [{
+"frames": [{
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_umcbn")
+}, {
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_kfeqt")
+}, {
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_8brw0")
+}, {
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_wq7w0")
+}, {
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_u572c")
+}, {
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_net65")
+}, {
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_hrhsd")
+}, {
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_ac1aw")
+}, {
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_ypyp8")
+}, {
+"duration": 0.5,
+"texture": SubResource("AtlasTexture_ku8wa")
+}],
+"loop": true,
+"name": &"Fired",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_krb7l"]
+
+[sub_resource type="Curve" id="Curve_umcbn"]
+_limits = [-360.0, 360.0, 0.0, 1.0]
+_data = [Vector2(0, 360), 0.0, 0.0, 0, 0, Vector2(0.38983053, -141.25641), 0.0, 0.0, 0, 0, Vector2(0.69491524, 282.88364), 0.0, 0.0, 0, 0, Vector2(1, -340.4737), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="Gradient" id="Gradient_umcbn"]
+colors = PackedColorArray(0.627451, 0.6901961, 0.20784314, 1, 0.29411766, 0.4862745, 0.32156864, 1)
+
+[sub_resource type="Curve" id="Curve_kfeqt"]
+_limits = [0.0, 200.0, 0.0, 1.0]
+_data = [Vector2(0, 200), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="Area2D" type="Area2D" unique_id=1144820367]
+scale = Vector2(1.5, 1.5)
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_script")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1319218041]
+sprite_frames = SubResource("SpriteFrames_qfl01")
+animation = &"Fired"
+frame_progress = 0.024526529
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1589747999]
+position = Vector2(-7.6, 0)
+scale = Vector2(0.75999904, -0.6066448)
+shape = SubResource("CircleShape2D_krb7l")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=6594821]
+position = Vector2(-8, 0)
+scale = Vector2(-0.9158157, 0.5676068)
+rect = Rect2(-8.819583, -10.519427, 16.780682, 20.519428)
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=247966453]
+amount = 50
+lifetime = 1.5
+preprocess = 2.5
+speed_scale = 3.0
+emission_shape = 3
+emission_rect_extents = Vector2(1, 5.055)
+particle_flag_align_y = true
+spread = 90.0
+gravity = Vector2(100, 0)
+angle_min = -720.0
+angle_max = 720.0
+angle_curve = SubResource("Curve_umcbn")
+scale_amount_min = 2.0
+scale_amount_max = 3.0
+color = Color(0.627451, 0.6901961, 0.20784314, 1)
+color_ramp = SubResource("Gradient_umcbn")
+hue_variation_min = -0.85
+hue_variation_max = 0.74
+anim_speed_curve = SubResource("Curve_kfeqt")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

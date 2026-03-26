@@ -1,9 +1,9 @@
-[gd_scene format=4 uid="uid://dw0dd3rtp5un5"]
+[gd_scene format=4 uid="uid://cobv1tk076adb"]
 
-[ext_resource type="PackedScene" uid="uid://c5kvuyd7wo1w7" path="res://scenes/player_sc.tscn" id="1_4cm2f"]
+[ext_resource type="PackedScene" uid="uid://6t4db4no4up0" path="res://scenes/player_sc.tscn" id="2_fdsry"]
 [ext_resource type="Texture2D" uid="uid://liy58p781tw7" path="res://assets/Dungeon Tile Set.png" id="2_iynk6"]
-[ext_resource type="PackedScene" uid="uid://c8wvjnp6dx5al" path="res://scenes/hud.tscn" id="3_hud"]
-[ext_resource type="Script" uid="uid://db0ibg2vxor83" path="res://scripts/game.gd" id="4_game"]
+[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="3_hud"]
+[ext_resource type="Script" path="res://scripts/game.gd" id="4_game"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cn2eb"]
 texture = ExtResource("2_iynk6")
@@ -158,16 +158,15 @@ sources/0 = SubResource("TileSetAtlasSource_cn2eb")
 [node name="Scene1" type="Node2D" unique_id=830306056]
 script = ExtResource("4_game")
 
-[node name="Player" parent="." unique_id=167515670 instance=ExtResource("1_4cm2f")]
-position = Vector2(1, 69)
-JUMP_VELOCITY = -800.0
-JUMP_BUFFER_TIME = 0.3
+[node name="Player" parent="." unique_id=167515670 instance=ExtResource("2_fdsry")]
+position = Vector2(22, 61)
 MAX_FALL_SPEED = 1600.0
 FALL_GRAVITY_MULTIPLIER = 3.0
 DASH_SPEED = 1500.0
 DASH_DURATION = 0.2
 
 [node name="Camera2D" type="Camera2D" parent="Player" unique_id=1415058490]
+position = Vector2(18.999992, -2)
 scale = Vector2(76.35171, 1.7891371)
 zoom = Vector2(0.75, 0.75)
 position_smoothing_enabled = true
