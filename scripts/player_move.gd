@@ -14,12 +14,7 @@ extends CharacterBody2D
 @export var JUMP_BUFFER_TIME: float = 0.1
 @export var COYOTE_TIME: float = 0.1
 @export var MAX_FALL_SPEED: float = 2000.0
-@export var FALL_GRAVITY_MULTIPLIER: float = 5
-
-@export_group("Dash")
-@export var DASH_SPEED: float = 1800.0
-@export var DASH_DURATION: float = 0.12
-@export var DASH_COOLDOWN: float = 0.5
+@export var FALL_GRAVITY_MULTIPLIER: float = 5.0
 
 @export_group("Apex Modifiers")
 @export var APEX_THRESHOLD: float = 15.0
@@ -29,66 +24,62 @@ extends CharacterBody2D
 @export_group("Corner Correction")
 @export var CORNER_CORRECTION_AMOUNT: float = 4.0
 
-var jump_buffer_timer: float = 0.0
-var coyote_timer: float = 0.0
-var dash_timer: float = 0.0
-var dash_cooldown_timer: float = 0.0
-var dash_direction: float = 0.0
-var is_dashing: bool = false
+# --- timers ---
+var _jump_buffer_timer: float = 0.0
+var _coyote_timer: float = 0.0
 
-@onready var left_raycast: RayCast2D = $RayCastLeft
-@onready var right_raycast: RayCast2D = $RayCastRight
-@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
-@onready var mana: Node2D = $Mana
+# --- node refs ---
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var mana: Node = $Mana
 @onready var recoil: Node = $RecoilComponent
+@onready var dash: Node = $DashComponent
+
+func _ready() -> void:
+	# Connect dash signals directly to animation functions
+	dash.dash_started.connect(_on_dash_started)
+	sprite.animation_finished.connect(_on_animation_finished)
+
+# Called instantly when dash begins — plays the full Dash animation
+func _on_dash_started() -> void:
+	sprite.play("Dash")
+
+# Called when any non-looping animation finishes
+func _on_animation_finished() -> void:
+	if sprite.animation == &"Dash":
+		sprite.play("Idle")
 
 func _physics_process(delta: float) -> void:
+	# --- coyote time ---
 	if is_on_floor():
-		coyote_timer = COYOTE_TIME
+		_coyote_timer = COYOTE_TIME
 	else:
-		coyote_timer -= delta
+		_coyote_timer -= delta
 
+	# --- jump buffer ---
 	if Input.is_action_just_pressed("jump"):
-		jump_buffer_timer = JUMP_BUFFER_TIME
+		_jump_buffer_timer = JUMP_BUFFER_TIME
 	else:
-		jump_buffer_timer -= delta
+		_jump_buffer_timer -= delta
 
-	if dash_cooldown_timer > 0:
-		dash_cooldown_timer -= delta
-
-	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0 and not recoil.is_active():
-		var dir := Input.get_axis("move_left", "move_right")
-		if dir == 0:
-			dir = -1.0 if animated_sprite.flip_h else 1.0
-		dash_direction = sign(dir)
-		dash_timer = DASH_DURATION
-		dash_cooldown_timer = DASH_COOLDOWN
-		is_dashing = true
-		velocity.y = 0.0
-		velocity.x = dash_direction * DASH_SPEED
-
-	if is_dashing:
-		dash_timer -= delta
-		if dash_timer <= 0:
-			is_dashing = false
-
+	# --- gravity ---
 	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
 	var current_speed := SPEED
 
-	if not is_on_floor() and not is_dashing and not recoil.is_active():
-		if Input.is_action_just_released("jump") and velocity.y < 0:
-			velocity.y *= VARIABLE_JUMP_MULTIPLIER
+	if not is_on_floor():
+		if not recoil.is_active() and not dash.is_active():
+			if Input.is_action_just_released("jump") and velocity.y < 0:
+				velocity.y *= VARIABLE_JUMP_MULTIPLIER
 
-		if abs(velocity.y) < APEX_THRESHOLD:
-			current_gravity *= APEX_GRAVITY_MULTIPLIER
-			current_speed += APEX_SPEED_BOOST
-		elif velocity.y > 0:
-			current_gravity *= FALL_GRAVITY_MULTIPLIER
+			if abs(velocity.y) < APEX_THRESHOLD:
+				current_gravity *= APEX_GRAVITY_MULTIPLIER
+				current_speed += APEX_SPEED_BOOST
+			elif velocity.y > 0:
+				current_gravity *= FALL_GRAVITY_MULTIPLIER
 
-		if recoil.is_recovering():
-			current_gravity *= recoil.get_recovery_factor()
+			if recoil.is_recovering():
+				current_gravity *= recoil.get_recovery_factor()
 
-		velocity += current_gravity * delta
+			velocity += current_gravity * delta
 
 		if velocity.y > MAX_FALL_SPEED:
 			velocity.y = MAX_FALL_SPEED
@@ -96,8 +87,9 @@ func _physics_process(delta: float) -> void:
 		if velocity.y < 0 and is_on_ceiling():
 			_handle_corner_correction()
 
-	if Input.is_action_just_pressed("shoot") and not is_dashing:
-		if mana.can_spend(mana.shoot_cost):
+	# --- shoot (right click recoil) ---
+	if Input.is_action_just_pressed("shoot"):
+		if not dash.is_active() and mana.can_spend(mana.shoot_cost):
 			mana.spend(mana.shoot_cost)
 			var mouse_pos := get_global_mouse_position()
 			var recoil_dir := (global_position - mouse_pos).normalized()
@@ -105,38 +97,26 @@ func _physics_process(delta: float) -> void:
 				recoil_dir = Vector2.UP
 			velocity = recoil.trigger(recoil_dir)
 
-	if jump_buffer_timer > 0 and coyote_timer > 0:
-		velocity.y = JUMP_VELOCITY
-		jump_buffer_timer = 0.0
-		coyote_timer = 0.0
+	# --- dash ---
+	if Input.is_action_just_pressed("dash"):
+		if dash.can_dash() and not recoil.is_active() and mana.can_spend(mana.dash_cost):
+			mana.spend(mana.dash_cost)
+			var dir := Input.get_axis("move_left", "move_right")
+			if dir == 0.0:
+				dir = -1.0 if sprite.flip_h else 1.0
+			velocity = dash.trigger(dir)
 
+	# --- jump ---
+	if _jump_buffer_timer > 0 and _coyote_timer > 0:
+		velocity.y = JUMP_VELOCITY
+		_jump_buffer_timer = 0.0
+		_coyote_timer = 0.0
+
+	# --- horizontal movement ---
 	var direction := Input.get_axis("move_left", "move_right")
 	var on_ground := is_on_floor()
 
-	# Animation & sprite flip
-	if direction != 0:
-		animated_sprite.flip_h = direction < 0
-
-	if is_dashing or (animated_sprite.animation == "Dash" and animated_sprite.is_playing()):
-		if animated_sprite.animation != "Dash":
-			animated_sprite.play("Dash")
-	elif recoil.is_active():
-		pass  # keep current animation during recoil
-	elif not on_ground:
-		if velocity.y < 0:
-			if animated_sprite.animation != "Jump":
-				animated_sprite.play("Jump")
-		elif velocity.y > 0:
-			if animated_sprite.animation != "Fall":
-				animated_sprite.play("Fall")
-	elif direction != 0:
-		if animated_sprite.animation != "Walk":
-			animated_sprite.play("Walk")
-	else:
-		if animated_sprite.animation != "Idle":
-			animated_sprite.play("Idle")
-
-	if not is_dashing and not recoil.is_active():
+	if not recoil.is_active() and not dash.is_active():
 		if direction != 0:
 			var accel := ACCELERATION if on_ground else AIR_ACCELERATION
 			velocity.x = move_toward(velocity.x, direction * current_speed, accel * delta)
@@ -144,13 +124,44 @@ func _physics_process(delta: float) -> void:
 			var decel := DECELERATION if on_ground else AIR_DECELERATION
 			velocity.x = move_toward(velocity.x, 0.0, decel * delta)
 
+	# --- animations ---
+	_update_animation(direction)
+
 	move_and_slide()
 
-func _handle_corner_correction() -> void:
-	if not left_raycast or not right_raycast:
+func _update_animation(direction: float) -> void:
+	# Don't interrupt Dash animation — let it complete naturally (_on_animation_finished handles the transition)
+	if sprite.animation == &"Dash" and sprite.is_playing():
 		return
-	var left_hitting: bool = left_raycast.is_colliding()
-	var right_hitting: bool = right_raycast.is_colliding()
+
+	# Dash active but animation already finished (safety guard)
+	if dash.is_active():
+		return
+
+	# Recoil — freeze animation
+	if recoil.is_active():
+		return
+
+	# Air animations
+	if not is_on_floor():
+		if velocity.y < 0:
+			sprite.play("Jump")
+		else:
+			sprite.play("Fall")
+		return
+
+	# Ground animations
+	if direction != 0:
+		sprite.play("Walk")
+		sprite.flip_h = direction < 0
+	else:
+		sprite.play("Idle")
+
+func _handle_corner_correction() -> void:
+	if not $RayCastLeft or not $RayCastRight:
+		return
+	var left_hitting: bool = $RayCastLeft.is_colliding()
+	var right_hitting: bool = $RayCastRight.is_colliding()
 
 	if left_hitting and right_hitting:
 		return
