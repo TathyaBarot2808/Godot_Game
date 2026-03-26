@@ -37,3 +37,89 @@ offset_bottom = 30.0
 grow_horizontal = 2
 text = "Mana: 100 / 100"
 vertical_alignment = 1
+
+[node name="LoadoutContainer" type="HBoxContainer" parent="." unique_id=459448068]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -260.0
+offset_top = -80.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="Slot0" type="Panel" parent="LoadoutContainer" unique_id=1106952675]
+custom_minimum_size = Vector2(75, 60)
+layout_mode = 2
+
+[node name="Highlight" type="Panel" parent="LoadoutContainer/Slot0" unique_id=475706670]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AbilityLabel" type="Label" parent="LoadoutContainer/Slot0" unique_id=1782238942]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "---"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot1" type="Panel" parent="LoadoutContainer" unique_id=1742110967]
+custom_minimum_size = Vector2(75, 60)
+layout_mode = 2
+
+[node name="Highlight" type="Panel" parent="LoadoutContainer/Slot1" unique_id=629036755]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AbilityLabel" type="Label" parent="LoadoutContainer/Slot1" unique_id=1704164861]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "---"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot2" type="Panel" parent="LoadoutContainer" unique_id=2053614938]
+custom_minimum_size = Vector2(75, 60)
+layout_mode = 2
+
+[node name="Highlight" type="Panel" parent="LoadoutContainer/Slot2" unique_id=1971574182]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AbilityLabel" type="Label" parent="LoadoutContainer/Slot2" unique_id=1116022300]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "---"
+horizontal_alignment = 1
+vertical_alignment = 1

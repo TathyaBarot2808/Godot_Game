@@ -18,8 +18,8 @@ var regen_timer: float = 0.0
 
 func _ready() -> void:
 	current_mana = max_mana
-	
-	
+
+
 func _process(delta: float) -> void:
 	if regen_timer > 0:
 		regen_timer -= delta

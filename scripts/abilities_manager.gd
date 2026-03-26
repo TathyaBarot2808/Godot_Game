@@ -4,12 +4,11 @@ class_name AbilitiesManager
 # Unlock state — edit defaults here or call unlock() at runtime (e.g. from a pickup)
 var _unlocked: Dictionary = {
 	"recoil": true,   # player starts with recoil (shoot)
-	"dash":   false,  # locked until unlocked by gameplay
+	"dash":   true,  # locked until unlocked by gameplay
 }
 
 # Populated automatically in _ready from child AbilityBase nodes
 var _components: Dictionary = {}
-
 func _ready() -> void:
 	for child in get_children():
 		if child is AbilityBase:
@@ -51,6 +50,13 @@ func lock(ability_name: String) -> void:
 
 func _is_unlocked(ability_name: String) -> bool:
 	return _unlocked.get(ability_name, false)
+	
+func get_unlocked_abilities() -> Array[String]:
+	var result: Array[String] = []
+	for ability_name in _unlocked:
+		if _unlocked[ability_name]:
+			result.append(ability_name)
+	return result
 
 # ── Private ───────────────────────────────────────────────────────────────────
 
