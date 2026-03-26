@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://ng0hy5sgafi4" path="res://scenes/mana_sc.tscn" id="3_mana"]
 [ext_resource type="Script" uid="uid://cjkt10dyt51sx" path="res://scripts/recoil_component.gd" id="4_recoil"]
 [ext_resource type="Script" uid="uid://kq34llptxc8b" path="res://scripts/dash_component.gd" id="5_orbwo"]
+[ext_resource type="Script" path="res://scripts/abilities_manager.gd" id="6_abmgr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(35, 101.75)
@@ -274,8 +275,11 @@ frame_progress = 0.38880125
 
 [node name="Mana" parent="." unique_id=236815105 instance=ExtResource("3_mana")]
 
-[node name="RecoilComponent" type="Node" parent="." unique_id=152948713]
+[node name="AbilitiesManager" type="Node" parent="." unique_id=152948713]
+script = ExtResource("6_abmgr")
+
+[node name="recoil" type="Node" parent="AbilitiesManager" unique_id=152948714]
 script = ExtResource("4_recoil")
 
-[node name="DashComponent" type="Node" parent="." unique_id=855540878]
+[node name="dash" type="Node" parent="AbilitiesManager" unique_id=855540879]
 script = ExtResource("5_orbwo")

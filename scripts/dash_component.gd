@@ -1,4 +1,4 @@
-extends Node
+extends AbilityBase
 
 @export_group("Dash Settings")
 @export var DASH_SPEED: float = 1800.0
@@ -18,20 +18,22 @@ func _physics_process(delta: float) -> void:
 		if _dash_timer <= 0:
 			_is_dashing = false
 			dash_ended.emit()
-
 	if _cooldown_timer > 0:
 		_cooldown_timer -= delta
 
-func trigger(direction: float) -> Vector2:
-	# direction = -1.0 (left) or 1.0 (right) from Input.get_axis
+# ── AbilityBase interface ─────────────────────────────────────────────────────
+
+func can_use() -> bool:
+	return not _is_dashing and _cooldown_timer <= 0.0
+
+# args: { "direction": float }  (-1.0 left, 1.0 right)
+func trigger(args: Dictionary) -> Variant:
+	var direction: float = args.get("direction", 1.0)
 	_is_dashing = true
 	_dash_timer = DASH_DURATION
 	_cooldown_timer = DASH_COOLDOWN
 	dash_started.emit()
 	return Vector2(direction * DASH_SPEED, 0.0)
-
-func can_dash() -> bool:
-	return not _is_dashing and _cooldown_timer <= 0.0
 
 func is_active() -> bool:
 	return _is_dashing

@@ -24,151 +24,166 @@ extends CharacterBody2D
 @export_group("Corner Correction")
 @export var CORNER_CORRECTION_AMOUNT: float = 4.0
 
-# --- timers ---
 var _jump_buffer_timer: float = 0.0
 var _coyote_timer: float = 0.0
 
-# --- node refs ---
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var mana: Node = $Mana
-@onready var recoil: Node = $RecoilComponent
-@onready var dash: Node = $DashComponent
+@onready var abilities: AbilitiesManager = $AbilitiesManager
+# Typed refs for helpers that need ability-specific methods beyond the base interface
+@onready var _recoil: Node = $AbilitiesManager/recoil
+@onready var _dash: Node = $AbilitiesManager/dash
 
 func _ready() -> void:
-	# Connect dash signals directly to animation functions
-	dash.dash_started.connect(_on_dash_started)
+	_dash.dash_started.connect(_on_dash_started)
 	sprite.animation_finished.connect(_on_animation_finished)
 
-# Called instantly when dash begins — plays the full Dash animation
 func _on_dash_started() -> void:
 	sprite.play("Dash")
 
-# Called when any non-looping animation finishes
 func _on_animation_finished() -> void:
 	if sprite.animation == &"Dash":
 		sprite.play("Idle")
 
 func _physics_process(delta: float) -> void:
-	# --- coyote time ---
-	if is_on_floor():
-		_coyote_timer = COYOTE_TIME
-	else:
-		_coyote_timer -= delta
+	_tick_coyote(delta)
+	_tick_jump_buffer(delta)
+	_apply_gravity(delta)
+	_handle_shoot()
+	_handle_dash()
+	_handle_jump()
+	_handle_movement(delta)
+	_update_animation(Input.get_axis("move_left", "move_right"))
+	move_and_slide()
 
-	# --- jump buffer ---
-	if Input.is_action_just_pressed("jump"):
-		_jump_buffer_timer = JUMP_BUFFER_TIME
-	else:
-		_jump_buffer_timer -= delta
+# ── Input Handlers ────────────────────────────────────────────────────────────
 
-	# --- gravity ---
-	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
-	var current_speed := SPEED
+func _handle_shoot() -> void:
+	if not Input.is_action_just_pressed("shoot"):
+		return
+	if abilities.is_active("dash"):
+		return
+	if not mana.can_spend(mana.shoot_cost):
+		return
+	var mouse_pos := get_global_mouse_position()
+	var dir := (global_position - mouse_pos).normalized()
+	if dir == Vector2.ZERO:
+		dir = Vector2.UP
+	var result = abilities.execute("recoil", {"direction": dir})
+	if result != null:
+		mana.spend(mana.shoot_cost)
+		velocity = result
 
-	if not is_on_floor():
-		if not recoil.is_active() and not dash.is_active():
-			if Input.is_action_just_released("jump") and velocity.y < 0:
-				velocity.y *= VARIABLE_JUMP_MULTIPLIER
+func _handle_dash() -> void:
+	if not Input.is_action_just_pressed("dash"):
+		return
+	if abilities.is_active("recoil"):
+		return
+	if not mana.can_spend(mana.dash_cost):
+		return
+	var dir := Input.get_axis("move_left", "move_right")
+	if dir == 0.0:
+		dir = -1.0 if sprite.flip_h else 1.0
+	var result = abilities.execute("dash", {"direction": dir})
+	if result != null:
+		mana.spend(mana.dash_cost)
+		velocity = result
 
-			if abs(velocity.y) < APEX_THRESHOLD:
-				current_gravity *= APEX_GRAVITY_MULTIPLIER
-				current_speed += APEX_SPEED_BOOST
-			elif velocity.y > 0:
-				current_gravity *= FALL_GRAVITY_MULTIPLIER
-
-			if recoil.is_recovering():
-				current_gravity *= recoil.get_recovery_factor()
-
-			velocity += current_gravity * delta
-
-		if velocity.y > MAX_FALL_SPEED:
-			velocity.y = MAX_FALL_SPEED
-
-		if velocity.y < 0 and is_on_ceiling():
-			_handle_corner_correction()
-
-	# --- shoot (right click recoil) ---
-	if Input.is_action_just_pressed("shoot"):
-		if not dash.is_active() and mana.can_spend(mana.shoot_cost):
-			mana.spend(mana.shoot_cost)
-			var mouse_pos := get_global_mouse_position()
-			var recoil_dir := (global_position - mouse_pos).normalized()
-			if recoil_dir == Vector2.ZERO:
-				recoil_dir = Vector2.UP
-			velocity = recoil.trigger(recoil_dir)
-
-	# --- dash ---
-	if Input.is_action_just_pressed("dash"):
-		if dash.can_dash() and not recoil.is_active() and mana.can_spend(mana.dash_cost):
-			mana.spend(mana.dash_cost)
-			var dir := Input.get_axis("move_left", "move_right")
-			if dir == 0.0:
-				dir = -1.0 if sprite.flip_h else 1.0
-			velocity = dash.trigger(dir)
-
-	# --- jump ---
+func _handle_jump() -> void:
 	if _jump_buffer_timer > 0 and _coyote_timer > 0:
 		velocity.y = JUMP_VELOCITY
 		_jump_buffer_timer = 0.0
 		_coyote_timer = 0.0
 
-	# --- horizontal movement ---
+# ── Movement & Gravity ────────────────────────────────────────────────────────
+
+func _apply_gravity(delta: float) -> void:
+	if is_on_floor():
+		return
+	if abilities.is_active("recoil") or abilities.is_active("dash"):
+		if velocity.y > MAX_FALL_SPEED:
+			velocity.y = MAX_FALL_SPEED
+		if velocity.y < 0 and is_on_ceiling():
+			_handle_corner_correction()
+		return
+
+	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
+
+	if Input.is_action_just_released("jump") and velocity.y < 0:
+		velocity.y *= VARIABLE_JUMP_MULTIPLIER
+
+	if abs(velocity.y) < APEX_THRESHOLD:
+		current_gravity *= APEX_GRAVITY_MULTIPLIER
+	elif velocity.y > 0:
+		current_gravity *= FALL_GRAVITY_MULTIPLIER
+
+	if _recoil.is_recovering():
+		current_gravity *= _recoil.get_recovery_factor()
+
+	velocity += current_gravity * delta
+
+	if velocity.y > MAX_FALL_SPEED:
+		velocity.y = MAX_FALL_SPEED
+
+	if velocity.y < 0 and is_on_ceiling():
+		_handle_corner_correction()
+
+func _handle_movement(delta: float) -> void:
+	if abilities.is_active("recoil") or abilities.is_active("dash"):
+		return
 	var direction := Input.get_axis("move_left", "move_right")
 	var on_ground := is_on_floor()
+	var current_speed := SPEED + (APEX_SPEED_BOOST if abs(velocity.y) < APEX_THRESHOLD else 0.0)
 
-	if not recoil.is_active() and not dash.is_active():
-		if direction != 0:
-			var accel := ACCELERATION if on_ground else AIR_ACCELERATION
-			velocity.x = move_toward(velocity.x, direction * current_speed, accel * delta)
-		else:
-			var decel := DECELERATION if on_ground else AIR_DECELERATION
-			velocity.x = move_toward(velocity.x, 0.0, decel * delta)
+	if direction != 0:
+		var accel := ACCELERATION if on_ground else AIR_ACCELERATION
+		velocity.x = move_toward(velocity.x, direction * current_speed, accel * delta)
+	else:
+		var decel := DECELERATION if on_ground else AIR_DECELERATION
+		velocity.x = move_toward(velocity.x, 0.0, decel * delta)
 
-	# --- animations ---
-	_update_animation(direction)
+# ── Timers ────────────────────────────────────────────────────────────────────
 
-	move_and_slide()
+func _tick_coyote(delta: float) -> void:
+	if is_on_floor():
+		_coyote_timer = COYOTE_TIME
+	else:
+		_coyote_timer -= delta
+
+func _tick_jump_buffer(delta: float) -> void:
+	if Input.is_action_just_pressed("jump"):
+		_jump_buffer_timer = JUMP_BUFFER_TIME
+	else:
+		_jump_buffer_timer -= delta
+
+# ── Animation ─────────────────────────────────────────────────────────────────
 
 func _update_animation(direction: float) -> void:
-	# Don't interrupt Dash animation — let it complete naturally (_on_animation_finished handles the transition)
+	# Let Dash animation play to completion — _on_animation_finished handles the transition
 	if sprite.animation == &"Dash" and sprite.is_playing():
 		return
-
-	# Dash active but animation already finished (safety guard)
-	if dash.is_active():
+	if abilities.is_active("dash"):
 		return
-
-	# Recoil — freeze animation
-	if recoil.is_active():
+	if abilities.is_active("recoil"):
 		return
-
-	# Air animations
 	if not is_on_floor():
-		if velocity.y < 0:
-			sprite.play("Jump")
-		else:
-			sprite.play("Fall")
+		sprite.play("Jump" if velocity.y < 0 else "Fall")
 		return
-
-	# Ground animations
 	if direction != 0:
 		sprite.play("Walk")
 		sprite.flip_h = direction < 0
 	else:
 		sprite.play("Idle")
 
+# ── Corner Correction ─────────────────────────────────────────────────────────
+
 func _handle_corner_correction() -> void:
-	if not $RayCastLeft or not $RayCastRight:
+	var left := $RayCastLeft
+	var right := $RayCastRight
+	if not left or not right:
 		return
-	var left_hitting: bool = $RayCastLeft.is_colliding()
-	var right_hitting: bool = $RayCastRight.is_colliding()
-
-	if left_hitting and right_hitting:
+	var left_hit: bool = left.is_colliding()
+	var right_hit: bool = right.is_colliding()
+	if left_hit == right_hit:
 		return
-	if not left_hitting and not right_hitting:
-		return
-
-	if left_hitting and not right_hitting:
-		global_position.x += CORNER_CORRECTION_AMOUNT
-	elif right_hitting and not left_hitting:
-		global_position.x -= CORNER_CORRECTION_AMOUNT
+	global_position.x += CORNER_CORRECTION_AMOUNT * (-1.0 if left_hit else 1.0)
