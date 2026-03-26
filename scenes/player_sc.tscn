@@ -3,8 +3,11 @@
 [ext_resource type="Script" uid="uid://cip461irxrac7" path="res://scripts/player_move.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://cfso8m4titi25" path="res://assets/Player_Sprite-sheet.png" id="2_g2els"]
 [ext_resource type="PackedScene" path="res://scenes/mana_sc.tscn" id="3_mana"]
-
 [ext_resource type="Texture2D" uid="uid://de6ne8nac6fgl" path="res://assets/Player_Shoot_Animation.png" id="5_orbwo"]
+[ext_resource type="Script" uid="uid://02ay3kn372ei" path="res://scripts/abilities_manager.gd" id="10_abilities"]
+[ext_resource type="Script" uid="uid://bh4m007p25rw2" path="res://scripts/loadout.gd" id="11_loadout"]
+[ext_resource type="Script" uid="uid://kq34llptxc8b" path="res://scripts/dash_component.gd" id="12_dash"]
+[ext_resource type="Script" uid="uid://s45plqefiv7" path="res://scripts/shoot_component.gd" id="13_shoot"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(35, 101.75)
@@ -300,9 +303,11 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D" unique_id=167515670]
+position = Vector2(0, -1)
 collision_layer = 2
 collision_mask = 5
 script = ExtResource("1_g2els")
+DASH_SPEED = 1200.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=928330627]
 position = Vector2(17.5, 1.875)
@@ -322,11 +327,22 @@ scale = Vector2(1.5, 1.5)
 position = Vector2(-1, -1)
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_fjrip")
-animation = &"Jump"
+animation = &"Dash"
 autoplay = "Idle"
 
 [node name="Mana" parent="." unique_id=236815105 instance=ExtResource("3_mana")]
 
+[node name="AbilitiesManager" type="Node" parent="." unique_id=999001]
+script = ExtResource("10_abilities")
+
+[node name="LoadoutManager" type="Node" parent="AbilitiesManager" unique_id=999002]
+script = ExtResource("11_loadout")
+
+[node name="dash" type="Node" parent="AbilitiesManager" unique_id=999003]
+script = ExtResource("12_dash")
+
+[node name="shoot" type="Node" parent="AbilitiesManager" unique_id=999004]
+script = ExtResource("13_shoot")
 
 [node name="FirePoint" type="Node2D" parent="." unique_id=238434010]
 position = Vector2(24, -5)

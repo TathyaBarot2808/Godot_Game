@@ -41,10 +41,10 @@ extends CharacterBody2D
 # -------------------------------------------------------------------------
 var jump_buffer_timer: float = 0.0  # Counts down the jump buffer
 var coyote_timer: float = 0.0       # Counts down coyote time
-var dash_timer: float = 0.0         # Counts down the active dash string
-var dash_cooldown_timer: float = 0.0# Counts down until dash is ready again
-var dash_direction: float = 0.0     # Remembers which way we dashed (-1 is Left, 1 is Right)
 var is_dashing: bool = false        # Simple True/False check to see if we are currently dashing
+
+@onready var abilities: AbilitiesManager = $AbilitiesManager
+@onready var loadout: LoadoutManager = $AbilitiesManager/LoadoutManager
 
 const PROJECTILE_SCENE := preload("res://scenes/player_projectile_sc.tscn") # Loads the bullet into memory so we can spawn it instantly
 
@@ -58,6 +58,7 @@ const PROJECTILE_SCENE := preload("res://scenes/player_projectile_sc.tscn") # Lo
 @onready var mana: Node2D = $Mana                            # The script managing our magical energy
 @onready var fire_point: Node2D = $FirePoint                 # The physical point where bullets spawn
 @onready var shoot_effect: AnimatedSprite2D = $ShootEffectSprite # The visual black hole overlay
+@onready var _dash_comp: Node = $AbilitiesManager/dash       # Reference to the modular dash behavior
 
 var is_shooting_action_active: bool = false                  # True if the user pressed shoot and we are waiting for frame 4
 var stored_shoot_direction: Vector2 = Vector2.ZERO           # Remembers exactly where the mouse was when the trigger was pulled
@@ -82,244 +83,224 @@ const SHOOT_EFFECT_BASE_Y: float = 3.0
 # SYSTEM FUNCTIONS
 # -------------------------------------------------------------------------
 func _ready() -> void:
-	# A safety net! If the Godot editor hasn't loaded the ShootEffectSprite properly, try fetching it manually.
-	if shoot_effect == null:
-		shoot_effect = get_node_or_null("ShootEffectSprite")
-		
-	# If we found the node successfully...
+	# Connect to modular ability signals
+	if _dash_comp:
+		_dash_comp.dash_started.connect(_on_dash_started)
+		_dash_comp.dash_ended.connect(_on_dash_ended)
+
 	if shoot_effect != null:
-		# Wire up the "radio signals"! When the frame changes, or the animation ends, run these specific functions.
 		shoot_effect.frame_changed.connect(_on_shoot_effect_frame_changed)
 		shoot_effect.animation_finished.connect(_on_shoot_effect_animation_finished)
-		shoot_effect.hide() # Make sure the black hole is invisible when the game starts
+		shoot_effect.hide()
 	else:
-		push_error("CRITICAL: ShootEffectSprite not found in scene tree!")
+		push_error("CRITICAL: ShootEffectSprite not found!")
 
-# This runs exactly 60 times a second, handling all game physics and movement!
 func _physics_process(delta: float) -> void:
+	# Tick down timers
+	_tick_coyote(delta)
+	_tick_jump_buffer(delta)
+	_apply_gravity(delta)
 	
-	# --- TIMER COUNTDOWNS ---
+	# --- INNATE ABILITIES (always available, not tied to loadout) ---
+	_handle_innate_dash()      # Shift key → 8-directional dash
+	_handle_innate_shoot()     # LMB → projectile with black hole effect
 	
-	# COYOTE TIME: If on the floor, keep the timer full. If falling, tick it down!
+	# --- LOADOUT ABILITIES (future equippable skills) ---
+	_handle_slot_switch()
+	_handle_loadout_ability()
+
+	# Standard Movement
+	_handle_jump()
+	_handle_movement(delta)
+	_update_animation_and_sync()
+	
+	move_and_slide()
+
+# --- INNATE ABILITY HANDLERS ---
+
+# Dash: Fires on Shift, reads WASD for 8-directional input
+func _handle_innate_dash() -> void:
+	if not Input.is_action_just_pressed("dash"):
+		return
+	if not _dash_comp.can_use():
+		return
+	if not mana.can_spend(mana.dash_cost):
+		return
+
+	# Build an 8-directional vector from WASD
+	var dir := Vector2.ZERO
+	dir.x = Input.get_axis("move_left", "move_right")  # A/D → -1 / +1
+	dir.y = Input.get_axis("move_up", "move_down")      # W/S → -1 / +1
+
+	# If no keys are held, dash the way the sprite is facing
+	if dir == Vector2.ZERO:
+		dir = Vector2.LEFT if animated_sprite.flip_h else Vector2.RIGHT
+
+	var result = _dash_comp.trigger({"direction": dir})
+	if result is Vector2:
+		velocity = result
+	mana.spend(mana.dash_cost)
+
+# Shoot: Fires on LMB, always available regardless of loadout
+func _handle_innate_shoot() -> void:
+	if not Input.is_action_just_pressed("shoot"):
+		return
+	if is_dashing or is_shooting_action_active:
+		return
+	if not mana.can_spend(mana.shoot_cost):
+		return
+
+	mana.spend(mana.shoot_cost)
+	is_shooting_action_active = true
+	stored_shoot_direction = (get_global_mouse_position() - fire_point.global_position).normalized()
+
+	if shoot_effect:
+		shoot_effect.show()
+		shoot_effect.play("default")
+		shoot_effect.set_frame_and_progress(0, 0.0)
+
+# --- LOADOUT ABILITY HANDLERS (for future equippable abilities) ---
+
+func _handle_slot_switch() -> void:
+	if Input.is_action_just_pressed("slot_1"):
+		loadout.set_active_slot(0)
+	elif Input.is_action_just_pressed("slot_2"):
+		loadout.set_active_slot(1)
+	elif Input.is_action_just_pressed("slot_3"):
+		loadout.set_active_slot(2)
+
+# This handles equippable abilities from the loadout (not dash or shoot)
+func _handle_loadout_ability() -> void:
+	# For now, all slots are empty so this does nothing.
+	# When you add new abilities to the loadout in the future,
+	# they would be triggered here, e.g. with a separate keybind.
+	pass
+
+func _on_dash_started() -> void:
+	is_dashing = true
+	animated_sprite.play("Dash")
+
+func _on_dash_ended() -> void:
+	# Velocity is done — player stops zooming.
+	# We do NOT interrupt the animation here; we let it finish naturally.
+	# is_dashing stays true until the animation itself ends.
+	pass
+
+# --- MOVEMENT HELPERS ---
+
+func _tick_coyote(delta: float) -> void:
 	if is_on_floor():
 		coyote_timer = COYOTE_TIME
 	else:
 		coyote_timer -= delta
 
-	# JUMP BUFFER: If we hit jump, fill the timer. Otherwise, tick it down.
+func _tick_jump_buffer(delta: float) -> void:
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = JUMP_BUFFER_TIME
 	else:
 		jump_buffer_timer -= delta
 
-	# DASH COOLDOWN
-	if dash_cooldown_timer > 0:
-		dash_cooldown_timer -= delta
+func _apply_gravity(delta: float) -> void:
+	if is_on_floor() or is_dashing:
+		return
 
-	# --- INPUT HANDLING ---
-	
-	# DASH INPUT: If they press Dash, and it's cooled down, and they have 15 mana...
-	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0:
-		if mana.can_spend(mana.dash_cost):
-			mana.spend(mana.dash_cost) # Deduct mana
-			
-			# Figure out what direction to dash
-			var dir := Input.get_axis("move_left", "move_right")
-			if dir == 0: # If not pressing any keys, dash the way we are facing
-				dir = -1.0 if animated_sprite.flip_h else 1.0
-				
-			dash_direction = sign(dir)
-			dash_timer = DASH_DURATION
-			dash_cooldown_timer = DASH_COOLDOWN
-			is_dashing = true
-			
-			velocity.y = 0.0 # Stop falling while dashing
-			velocity.x = dash_direction * DASH_SPEED # Zoom horizontally
-
-	# SHOOT INPUT: If they press Shoot...
-	if Input.is_action_just_pressed("shoot") and not is_dashing:
-		# Check if they have enough mana
-		if mana.can_spend(mana.shoot_cost):
-			mana.spend(mana.shoot_cost)
-			is_shooting_action_active = true
-			
-			if shoot_effect != null:
-				shoot_effect.show()          # Reveal the black hole
-				shoot_effect.play("default") # Start the animation
-				shoot_effect.set_frame_and_progress(0, 0.0) # Force it to frame zero instantly
-			
-			# Snapshot the exact position of the mouse RIGHT NOW so the bullet points exactly where we clicked
-			var mouse_pos = get_global_mouse_position()
-			stored_shoot_direction = (mouse_pos - fire_point.global_position).normalized()
-
-	# --- DASH EXECUTION ---
-	if is_dashing:
-		dash_timer -= delta # Count down how long the dash has been active
-		if dash_timer <= 0:
-			is_dashing = false # Stop dashing when time runs out
-
-	# --- GRAVITY AND JUMP LOGIC ---
-	# Fetch natural gravity from the project settings and multiply it by our custom tweak
 	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
+	if Input.is_action_just_released("jump") and velocity.y < 0:
+		velocity.y *= VARIABLE_JUMP_MULTIPLIER
 
-	# Only apply gravity if we are airborne and NOT dashing
-	if not is_on_floor() and not is_dashing:
-		
-		# VARIABLE JUMP HEIGHT: If they let go of the jump button while going up, slash their upward speed!
-		if Input.is_action_just_released("jump") and velocity.y < 0:
-			velocity.y *= VARIABLE_JUMP_MULTIPLIER
+	if abs(velocity.y) < APEX_THRESHOLD:
+		current_gravity *= APEX_GRAVITY_MULTIPLIER
+	elif velocity.y > 0:
+		current_gravity *= FALL_GRAVITY_MULTIPLIER
 
-		# APEX HANG-TIME: If they are at the exact top of the jump arc (moving very slowly up or down)
-		if abs(velocity.y) < APEX_THRESHOLD:
-			current_gravity *= APEX_GRAVITY_MULTIPLIER # Less gravity = floating
-			current_speed += APEX_SPEED_BOOST          # More speed = horizontal leap capability
-		# FAST FALL: If they pass the apex and start falling down, crank up gravity!
-		elif velocity.y > 0:
-			current_gravity *= FALL_GRAVITY_MULTIPLIER
+	velocity += current_gravity * delta
+	velocity.y = minf(velocity.y, MAX_FALL_SPEED)
 
-		# Actually apply the calculated gravity to the vertical speed
-		velocity += current_gravity * delta
+	if velocity.y < 0 and (left_raycast.is_colliding() or right_raycast.is_colliding()):
+		_handle_corner_correction()
 
-		# CAP FALL SPEED: Don't let them fall faster than terminal velocity
-		if velocity.y > MAX_FALL_SPEED:
-			velocity.y = MAX_FALL_SPEED
-
-		# CORNER CORRECTION: If moving upward and we bonk our head, try to nudge around the corner
-		if velocity.y < 0 and is_on_ceiling():
-			_handle_corner_correction()
-
-
-	# JUMP EXECUTION: If they hit jump recently (buffer) AND walked off a ledge recently (coyote)... JUMP!
+func _handle_jump() -> void:
 	if jump_buffer_timer > 0 and coyote_timer > 0:
 		velocity.y = JUMP_VELOCITY
-		jump_buffer_timer = 0.0 # Reset timers so they don't double jump
+		jump_buffer_timer = 0.0
 		coyote_timer = 0.0
 
-	# --- MOVEMENT CALCULATION ---
-	# Gets -1 (Left), 1 (Right), or 0 (Nothing)
+func _handle_movement(delta: float) -> void:
+	if is_dashing:
+		return
+
 	var direction := Input.get_axis("move_left", "move_right")
-	var on_ground := is_on_floor()
 	var current_speed := SPEED + (APEX_SPEED_BOOST if abs(velocity.y) < APEX_THRESHOLD else 0.0)
 
-	# Sprite Flipping: Make the art face Left or Right based on input
 	if direction != 0:
+		var accel := ACCELERATION if is_on_floor() else AIR_ACCELERATION
+		velocity.x = move_toward(velocity.x, direction * current_speed, accel * delta)
 		animated_sprite.flip_h = direction < 0
-
-	# If the character faces Left, physically move the FirePoint and Black hole to the left side!
-	if animated_sprite.flip_h:
-		fire_point.position.x = -abs(fire_point.position.x)
-		if shoot_effect != null:
-			shoot_effect.flip_h = true
 	else:
-		fire_point.position.x = abs(fire_point.position.x)
-		if shoot_effect != null:
-			shoot_effect.flip_h = false
-
-	# --- ANIMATION STATE MACHINE ---
-	# This priority list decides exactly what the Base Sprite should look like right now.
-	if is_dashing or (animated_sprite.animation == "Dash" and animated_sprite.is_playing()):
-		if animated_sprite.animation != "Dash":
-			animated_sprite.play("Dash")
-	elif not on_ground:
-		if velocity.y < 0:
-			if animated_sprite.animation != "Jump":
-				animated_sprite.play("Jump")
-		elif velocity.y > 0:
-			if animated_sprite.animation != "Fall":
-				animated_sprite.play("Fall")
-	elif direction != 0:
-		if animated_sprite.animation != "Walk":
-			animated_sprite.play("Walk")
-	else:
-		var decel := DECELERATION if on_ground else AIR_DECELERATION
+		var decel := DECELERATION if is_on_floor() else AIR_DECELERATION
 		velocity.x = move_toward(velocity.x, 0.0, decel * delta)
 
-	# --- HORIZONTAL MOVEMENT ---
-	if not is_dashing:
-		if direction != 0:
-			# Accelerate towards top speed smoothly
-			var accel := ACCELERATION if on_ground else AIR_ACCELERATION
-			velocity.x = move_toward(velocity.x, direction * current_speed, accel * delta)
+	# Side Flipping for utility nodes
+	if animated_sprite.flip_h:
+		fire_point.position.x = -abs(fire_point.position.x)
+		if shoot_effect: shoot_effect.flip_h = true
+	else:
+		fire_point.position.x = abs(fire_point.position.x)
+		if shoot_effect: shoot_effect.flip_h = false
+
+func _update_animation_and_sync() -> void:
+	# If the Dash animation is still playing, don't override it.
+	# We also listen for when it finishes to clear the is_dashing flag.
+	if animated_sprite.animation == "Dash":
+		if animated_sprite.is_playing():
+			return  # Let it finish
 		else:
-			# Brake towards zero smoothly (skidding/sliding to a halt)
-			var decel := DECELERATION if on_ground else AIR_DECELERATION
-			velocity.x = move_toward(velocity.x, 0.0, decel * delta)
-
-	# --- DYNAMIC CHEST SYNCING ---
-	# Grabs exactly what animation/frame the code above just settled on.
-	var current_anim := animated_sprite.animation
-	var current_frame := animated_sprite.frame
-	
-	var y_offset := 0.0
-	# Reads our dictionary mapping to see how many pixels to shove everything up/down
-	if chest_y_offsets.has(current_anim) and current_frame < chest_y_offsets[current_anim].size():
-		y_offset = float(chest_y_offsets[current_anim][current_frame])
+			is_dashing = false  # Animation done — now we can switch states
 		
-	# Apply that offset!
-	fire_point.position.y = FIRE_POINT_BASE_Y + y_offset
-	if shoot_effect != null:
-		shoot_effect.position.y = SHOOT_EFFECT_BASE_Y + y_offset
-	# -----------------------------
+	if not is_on_floor():
+		animated_sprite.play("Jump" if velocity.y < 0 else "Fall")
+	elif abs(velocity.x) > 0.1:
+		animated_sprite.play("Walk")
+	else:
+		animated_sprite.play("Idle")
 
-	# Godot's built-in magic function that physically moves the character based on all the `velocity` changes above
-	move_and_slide()
+	# Physical Syncing
+	var anim := animated_sprite.animation
+	var frame := animated_sprite.frame
+	var y_off := 0.0
+	if chest_y_offsets.has(anim) and frame < chest_y_offsets[anim].size():
+		y_off = float(chest_y_offsets[anim][frame])
+		
+	fire_point.position.y = FIRE_POINT_BASE_Y + y_off
+	if shoot_effect:
+		shoot_effect.position.y = SHOOT_EFFECT_BASE_Y + y_off
 
-# Checks if the player's head barely clips a ceiling block, and gently shoves them left/right to slide past it smoothly.
 func _handle_corner_correction() -> void:
-	var left := $RayCastLeft
-	var right := $RayCastRight
-	if not left or not right:
-		return
-	var left_hit: bool = left.is_colliding()
-	var right_hit: bool = right.is_colliding()
-	if left_hit == right_hit:
-		return
-	if not left_hitting and not right_hitting:
-		return
-
-	if left_hitting and not right_hitting:
+	if left_raycast.is_colliding() and not right_raycast.is_colliding():
 		global_position.x += CORNER_CORRECTION_AMOUNT
-	elif right_hitting and not left_hitting:
+	elif right_raycast.is_colliding() and not left_raycast.is_colliding():
 		global_position.x -= CORNER_CORRECTION_AMOUNT
 
-# -------------------------------------------------------------------------
-# EFFECT SIGNAL HANDLERS
-# -------------------------------------------------------------------------
+# --- SHOOT EFFECT HANDLERS ---
 
-# This triggers every time the black hole's image updates to the next frame
 func _on_shoot_effect_frame_changed() -> void:
-	if shoot_effect.animation == "default":
-		# When it hits frame 4 exactly, pull the trigger!
-		if shoot_effect.frame == 4:
-			if is_shooting_action_active:
-				_fire_projectile()
-				is_shooting_action_active = false
-		# When it hits the last frame (7), kill the animation so it vanishes.
-		elif shoot_effect.frame == 7:
-			shoot_effect.hide()
-			shoot_effect.stop()
-
-# A failsafe just in case the animation naturally ends
-func _on_shoot_effect_animation_finished() -> void:
-	if shoot_effect.animation == "default":
+	if shoot_effect.animation == "default" and shoot_effect.frame == 4:
+		_fire_projectile()
+		is_shooting_action_active = false  # Reset so the player can shoot again
+	elif shoot_effect.frame == 7:
 		shoot_effect.hide()
+		shoot_effect.stop()
 
-# The actual function that puts the bullet into the world
+func _on_shoot_effect_animation_finished() -> void:
+	shoot_effect.hide()
+
 func _fire_projectile() -> void:
-	# 'instantiate' clones the bullet scene into reality
 	var proj = PROJECTILE_SCENE.instantiate()
-	
-	# Fetch our snapshotted target direction from back when the player first clicked
 	var dir = stored_shoot_direction
-	
-	# If they literally clicked perfectly on themselves (dir length 0), default to facing forward
 	if dir == Vector2.ZERO:
 		dir = Vector2.RIGHT if not animated_sprite.flip_h else Vector2.LEFT
 		
-	# Configure the newly born bullet's starting state
 	proj.global_position = fire_point.global_position
 	proj.direction = dir
-	proj.rotation = dir.angle() # Turn the visual artwork so it points forward
-	
-	# Toss the bullet into the actual Level's node tree so the physics engine can see it!
+	proj.rotation = dir.angle()
 	get_tree().current_scene.add_child(proj)

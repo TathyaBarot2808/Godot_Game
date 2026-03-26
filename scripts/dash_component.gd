@@ -1,7 +1,7 @@
 extends AbilityBase
 
 @export_group("Dash Settings")
-@export var DASH_SPEED: float = 1800.0
+@export var DASH_SPEED: float = 1200.0
 @export var DASH_DURATION: float = 0.12
 @export var DASH_COOLDOWN: float = 0.5
 
@@ -26,14 +26,17 @@ func _physics_process(delta: float) -> void:
 func can_use() -> bool:
 	return not _is_dashing and _cooldown_timer <= 0.0
 
-# args: { "direction": float }  (-1.0 left, 1.0 right)
+# args: { "direction": Vector2 }  — normalized 8-directional vector from WASD
 func trigger(args: Dictionary) -> Variant:
-	var direction: float = args.get("direction", 1.0)
+	var dir: Vector2 = args.get("direction", Vector2.RIGHT)
+	if dir == Vector2.ZERO:
+		dir = Vector2.RIGHT
+	dir = dir.normalized()
 	_is_dashing = true
 	_dash_timer = DASH_DURATION
 	_cooldown_timer = DASH_COOLDOWN
 	dash_started.emit()
-	return Vector2(direction * DASH_SPEED, 0.0)
+	return dir * DASH_SPEED
 
 func is_active() -> bool:
 	return _is_dashing
