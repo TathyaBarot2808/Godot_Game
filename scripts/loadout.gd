@@ -2,9 +2,9 @@ extends Node
 class_name LoadoutManager
 
 
-var loadout: Dictionary={
-	0: "dash",
-	1: "recoil",
+var loadout: Dictionary = {
+	0: "",
+	1: "",
 	2: "vdash",
 }
 
