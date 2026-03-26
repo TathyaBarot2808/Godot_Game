@@ -5,7 +5,7 @@ class_name LoadoutManager
 var loadout: Dictionary={
 	0: "dash",
 	1: "recoil",
-	2: "",
+	2: "vdash",
 }
 
 

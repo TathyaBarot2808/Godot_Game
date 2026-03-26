@@ -5,6 +5,7 @@ class_name AbilitiesManager
 var _unlocked: Dictionary = {
 	"recoil": true,   # player starts with recoil (shoot)
 	"dash":   true,  # locked until unlocked by gameplay
+	"vdash": true,
 }
 
 # Populated automatically in _ready from child AbilityBase nodes

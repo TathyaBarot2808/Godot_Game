@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://kq34llptxc8b" path="res://scripts/dash_component.gd" id="5_orbwo"]
 [ext_resource type="Script" uid="uid://02ay3kn372ei" path="res://scripts/abilities_manager.gd" id="6_abmgr"]
 [ext_resource type="Script" uid="uid://bh4m007p25rw2" path="res://scripts/loadout.gd" id="7_obawi"]
+[ext_resource type="Script" uid="uid://duui701iq33jb" path="res://scripts/vdash_component.gd" id="8_ykq2h"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(35, 101.75)
@@ -287,3 +288,6 @@ script = ExtResource("5_orbwo")
 
 [node name="LoadoutManager" type="Node" parent="AbilitiesManager" unique_id=1066335034]
 script = ExtResource("7_obawi")
+
+[node name="vdash" type="Node" parent="AbilitiesManager" unique_id=923373804]
+script = ExtResource("8_ykq2h")

@@ -7,6 +7,7 @@ extends Node2D
 @export var regen_delay: float = 2.0       # seconds after spending before regen starts
 @export var shoot_cost: float = 25.0  
 @export var dash_cost: float = 40.0  
+@export var vdash_cost: float=30.0
 
 
 signal mana_changed(current: float, max: float) 

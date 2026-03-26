@@ -39,11 +39,13 @@ var _coyote_timer: float = 0.0
 @onready var loadout: LoadoutManager = $AbilitiesManager/LoadoutManager
 @onready var _recoil: Node = $AbilitiesManager/recoil
 @onready var _dash: Node = $AbilitiesManager/dash
+@onready var _vdash: Node = $AbilitiesManager/vdash
 
 # ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 func _ready() -> void:
 	_dash.dash_started.connect(_on_dash_started)
+	_vdash.vdash_started.connect(_on_dash_started)
 	sprite.animation_finished.connect(_on_animation_finished)
 
 func _on_dash_started() -> void:
@@ -62,6 +64,8 @@ func _physics_process(delta: float) -> void:
 	_handle_slot_switch()
 	if loadout.get_active_ability() == "dash":	
 		_handle_dash()
+	if loadout.get_active_ability()=="vdash":
+		_handle_vdash()	
 	_handle_shoot()
 	_handle_jump()
 	_handle_movement(delta)
@@ -86,6 +90,9 @@ func _handle_dash() -> void:
 	if Input.is_action_just_pressed("dash"):
 		_execute_dash()
 
+func _handle_vdash() ->void:
+	if Input.is_action_just_pressed("vdash"):
+		_execute_vdash()
 # ── Shoot — routes to active loadout slot ─────────────────────────────────────
 
 func _handle_shoot() -> void:
@@ -103,7 +110,9 @@ func _handle_shoot() -> void:
 		"recoil":
 			_execute_recoil()
 		"dash":
-			_handle_dash()
+			_execute_dash()
+		"vdash":
+			_execute_vdash()
 		_:
 			push_error("player_move: no handler for ability -> " + ability)
 
@@ -138,6 +147,19 @@ func _execute_dash() -> void:
 		mana.spend(mana.dash_cost)
 		velocity = result
 
+func _execute_vdash() -> void:
+	if abilities.is_active("recoil") or abilities.is_active("dash"):
+		return
+	if not mana.can_spend(mana.vdash_cost):
+		return
+	var mouse_pos := get_global_mouse_position()
+	var dir := (mouse_pos - global_position).normalized()
+	if dir == Vector2.ZERO:
+		dir = Vector2.UP
+	var result: Variant = abilities.execute("vdash", {"direction": dir})
+	if result != null:
+		mana.spend(mana.vdash_cost)
+		velocity = result
 # ── Jump ──────────────────────────────────────────────────────────────────────
 
 func _handle_jump() -> void:
@@ -151,7 +173,7 @@ func _handle_jump() -> void:
 func _apply_gravity(delta: float) -> void:
 	if is_on_floor():
 		return
-	if abilities.is_active("recoil") or abilities.is_active("dash"):
+	if abilities.is_active("recoil") or abilities.is_active("dash") or abilities.is_active("vdash"):
 		return
 
 	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
@@ -166,6 +188,8 @@ func _apply_gravity(delta: float) -> void:
 
 	if _recoil.is_recovering():
 		current_gravity *= _recoil.get_recovery_factor()
+	if _vdash.is_recovering():
+		current_gravity *= _vdash.get_recovery_factor()
 
 	velocity += current_gravity * delta
 	velocity.y = minf(velocity.y, MAX_FALL_SPEED)
@@ -176,7 +200,7 @@ func _apply_gravity(delta: float) -> void:
 # ── Movement ──────────────────────────────────────────────────────────────────
 
 func _handle_movement(delta: float) -> void:
-	if abilities.is_active("recoil") or abilities.is_active("dash"):
+	if abilities.is_active("recoil") or abilities.is_active("dash") or abilities.is_active("vdash"):
 		return
 
 	var direction := Input.get_axis("move_left", "move_right")
