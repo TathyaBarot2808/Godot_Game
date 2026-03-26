@@ -161,7 +161,6 @@ func _physics_process(delta: float) -> void:
 	# --- GRAVITY AND JUMP LOGIC ---
 	# Fetch natural gravity from the project settings and multiply it by our custom tweak
 	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
-	var current_speed := SPEED
 
 	# Only apply gravity if we are airborne and NOT dashing
 	if not is_on_floor() and not is_dashing:
@@ -200,6 +199,7 @@ func _physics_process(delta: float) -> void:
 	# Gets -1 (Left), 1 (Right), or 0 (Nothing)
 	var direction := Input.get_axis("move_left", "move_right")
 	var on_ground := is_on_floor()
+	var current_speed := SPEED + (APEX_SPEED_BOOST if abs(velocity.y) < APEX_THRESHOLD else 0.0)
 
 	# Sprite Flipping: Make the art face Left or Right based on input
 	if direction != 0:
@@ -231,8 +231,8 @@ func _physics_process(delta: float) -> void:
 		if animated_sprite.animation != "Walk":
 			animated_sprite.play("Walk")
 	else:
-		if animated_sprite.animation != "Idle":
-			animated_sprite.play("Idle")
+		var decel := DECELERATION if on_ground else AIR_DECELERATION
+		velocity.x = move_toward(velocity.x, 0.0, decel * delta)
 
 	# --- HORIZONTAL MOVEMENT ---
 	if not is_dashing:
@@ -266,12 +266,13 @@ func _physics_process(delta: float) -> void:
 
 # Checks if the player's head barely clips a ceiling block, and gently shoves them left/right to slide past it smoothly.
 func _handle_corner_correction() -> void:
-	if not left_raycast or not right_raycast:
+	var left := $RayCastLeft
+	var right := $RayCastRight
+	if not left or not right:
 		return
-	var left_hitting: bool = left_raycast.is_colliding()
-	var right_hitting: bool = right_raycast.is_colliding()
-
-	if left_hitting and right_hitting:
+	var left_hit: bool = left.is_colliding()
+	var right_hit: bool = right.is_colliding()
+	if left_hit == right_hit:
 		return
 	if not left_hitting and not right_hitting:
 		return

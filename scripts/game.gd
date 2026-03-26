@@ -12,3 +12,4 @@ func _ready() -> void:
 	# Here, the Game script essentially introduces the HUD to the Player's mana pool
 	# so they can talk to each other without being directly tangled up.
 	hud.setup(player.mana)
+	hud.setup_loadout(player.abilities.get_node("LoadoutManager"))
