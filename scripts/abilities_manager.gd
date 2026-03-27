@@ -3,9 +3,10 @@ class_name AbilitiesManager
 
 # Unlock state — edit defaults here or call unlock() at runtime (e.g. from a pickup)
 var _unlocked: Dictionary = {
-	"shoot": true,   # player starts with shoot ability
-	"dash":  true,   # dash is currently unlocked by default
-	"vdash": true,   # vertical dash unlocked by default
+	"shoot": true,   # innate projectile shoot
+	"dash":  true,   # innate 8-directional dash
+	"recoil": true,  # loadout slot 0 — launch away from mouse
+	"vdash": true,   # loadout slot 2 — launch toward mouse
 }
 
 # Populated automatically in _ready from child AbilityBase nodes

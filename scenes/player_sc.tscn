@@ -2,12 +2,13 @@
 
 [ext_resource type="Script" uid="uid://cip461irxrac7" path="res://scripts/player_move.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://cfso8m4titi25" path="res://assets/Player_Sprite-sheet.png" id="2_g2els"]
-[ext_resource type="PackedScene" path="res://scenes/mana_sc.tscn" id="3_mana"]
+[ext_resource type="PackedScene" uid="uid://ng0hy5sgafi4" path="res://scenes/mana_sc.tscn" id="3_mana"]
 [ext_resource type="Texture2D" uid="uid://de6ne8nac6fgl" path="res://assets/Player_Shoot_Animation.png" id="5_orbwo"]
 [ext_resource type="Script" uid="uid://02ay3kn372ei" path="res://scripts/abilities_manager.gd" id="10_abilities"]
 [ext_resource type="Script" uid="uid://bh4m007p25rw2" path="res://scripts/loadout.gd" id="11_loadout"]
 [ext_resource type="Script" uid="uid://kq34llptxc8b" path="res://scripts/dash_component.gd" id="12_dash"]
 [ext_resource type="Script" uid="uid://s45plqefiv7" path="res://scripts/shoot_component.gd" id="13_shoot"]
+[ext_resource type="Script" uid="uid://cjkt10dyt51sx" path="res://scripts/recoil_component.gd" id="15_recoil"]
 [ext_resource type="Script" uid="uid://duui701iq33jb" path="res://scripts/vdash_component.gd" id="14_vdash"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
@@ -344,6 +345,9 @@ script = ExtResource("12_dash")
 
 [node name="shoot" type="Node" parent="AbilitiesManager" unique_id=999004]
 script = ExtResource("13_shoot")
+
+[node name="recoil" type="Node" parent="AbilitiesManager" unique_id=266335034]
+script = ExtResource("15_recoil")
 
 [node name="vdash" type="Node" parent="AbilitiesManager" unique_id=923373804]
 script = ExtResource("14_vdash")

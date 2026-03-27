@@ -3,7 +3,7 @@ class_name LoadoutManager
 
 
 var loadout: Dictionary = {
-	0: "",
+	0: "recoil",
 	1: "",
 	2: "vdash",
 }
@@ -18,7 +18,6 @@ func set_active_slot(index: int) -> void:
 		return
 	active_slot=index
 	loadout_changed.emit()
-	
 
 
 func get_active_ability() -> String:
