@@ -8,9 +8,9 @@ extends Node2D
 @export var max_mana: float = 100.0        # The absolute maximum mana the player can hold
 @export var regen_rate: float = 20.0       # How much mana regenerates per second
 @export var regen_delay: float = 2.0       # How many seconds to wait after spending before it regenerates
-@export var shoot_cost: float = 5.0        # Mana consumed when firing a bullet
+@export var shoot_cost: float = 5.0        # Mana consumed when firing a bullet (0 = free, shoot anytime)
 @export var dash_cost: float = 15.0        # Mana consumed when dashing
-@export var vdash_cost: float = 30.0       # Mana consumed when using vertical dash
+@export var recoil_cost: float = 30.0      # Mana consumed when using recoil
 
 # A "signal" is like a radio broadcast. When mana changes, this fires off a message.
 # The HUD script is listening to this radio station, so it knows when to update the UI bar!

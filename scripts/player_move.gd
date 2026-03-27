@@ -118,26 +118,19 @@ func _physics_process(delta: float) -> void:
 
 # --- INNATE ABILITY HANDLERS ---
 
-# Shoot: Fires on LMB, always available regardless of loadout
-# Blocked when recoil is the active loadout ability (it handles LMB instead)
+# Shoot: Fires on LMB — always available, costs mana.shoot_cost
 func _handle_innate_shoot() -> void:
 	if not Input.is_action_just_pressed("shoot"):
 		return
-	# if loadout.get_active_ability() == "recoil":
-	# 	return  # recoil takes priority over innate shoot
-	# if is_dashing or is_shooting_action_active:
-	# 	return
+	if not abilities.can_use("shoot"):
+		return
 	if not mana.can_spend(mana.shoot_cost):
 		return
 
-	mana.spend(mana.shoot_cost)
-	is_shooting_action_active = true
-	stored_shoot_direction = (get_global_mouse_position() - fire_point.global_position).normalized()
-
-	if shoot_effect:
-		shoot_effect.show()
-		shoot_effect.play("default")
-		shoot_effect.set_frame_and_progress(0, 0.0)
+	var direction := (get_global_mouse_position() - fire_point.global_position).normalized()
+	var started: Variant = abilities.execute("shoot", {"direction": direction})
+	if started == true:
+		mana.spend(mana.shoot_cost)
 
 # --- LOADOUT ABILITY HANDLERS (for future equippable abilities) ---
 
@@ -161,9 +154,9 @@ func _handle_loadout_ability() -> void:
 				_execute_dash()
 
 func _execute_recoil() -> void:
-	if is_dashing:
+	if abilities.is_active("dash"):
 		return
-	if not mana.can_spend(mana.shoot_cost):
+	if not mana.can_spend(mana.recoil_cost):
 		return
 	var mouse_pos := get_global_mouse_position()
 	var dir := (global_position - mouse_pos).normalized()
@@ -171,7 +164,7 @@ func _execute_recoil() -> void:
 		dir = Vector2.UP
 	var result: Variant = abilities.execute("recoil", {"direction": dir})
 	if result != null:
-		mana.spend(mana.shoot_cost)
+		mana.spend(mana.recoil_cost)
 		velocity = result
 
 func _execute_dash() -> void:
@@ -309,6 +302,21 @@ func _on_shoot_effect_frame_changed() -> void:
 
 func _on_shoot_effect_animation_finished() -> void:
 	shoot_effect.hide()
+	is_shooting_action_active=false
+
+func start_shooting(direction: Vector2) -> bool:
+	if is_shooting_action_active:
+		return false
+	if direction == Vector2.ZERO:
+		direction = Vector2.RIGHT if not animated_sprite.flip_h else Vector2.LEFT
+	stored_shoot_direction = direction.normalized()
+	if shoot_effect == null:
+		return false
+	is_shooting_action_active = true
+	shoot_effect.show()
+	shoot_effect.play("default")
+	shoot_effect.set_frame_and_progress(0, 0.0)
+	return true
 
 func _fire_projectile() -> void:
 	var proj = PROJECTILE_SCENE.instantiate()

@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://bh4m007p25rw2" path="res://scripts/loadout.gd" id="11_loadout"]
 [ext_resource type="Script" uid="uid://kq34llptxc8b" path="res://scripts/dash_component.gd" id="12_dash"]
 [ext_resource type="Script" uid="uid://s45plqefiv7" path="res://scripts/shoot_component.gd" id="13_shoot"]
-[ext_resource type="Script" path="res://scripts/recoil_component.gd" id="15_recoil"]
+[ext_resource type="Script" uid="uid://cjkt10dyt51sx" path="res://scripts/recoil_component.gd" id="15_recoil"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(35, 101.75)
