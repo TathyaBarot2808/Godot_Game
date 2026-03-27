@@ -8,8 +8,7 @@
 [ext_resource type="Script" uid="uid://bh4m007p25rw2" path="res://scripts/loadout.gd" id="11_loadout"]
 [ext_resource type="Script" uid="uid://kq34llptxc8b" path="res://scripts/dash_component.gd" id="12_dash"]
 [ext_resource type="Script" uid="uid://s45plqefiv7" path="res://scripts/shoot_component.gd" id="13_shoot"]
-[ext_resource type="Script" uid="uid://cjkt10dyt51sx" path="res://scripts/recoil_component.gd" id="15_recoil"]
-[ext_resource type="Script" uid="uid://duui701iq33jb" path="res://scripts/vdash_component.gd" id="14_vdash"]
+[ext_resource type="Script" path="res://scripts/recoil_component.gd" id="15_recoil"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(35, 101.75)
@@ -309,7 +308,6 @@ position = Vector2(0, -1)
 collision_layer = 2
 collision_mask = 5
 script = ExtResource("1_g2els")
-DASH_SPEED = 1200.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=928330627]
 position = Vector2(17.5, 1.875)
@@ -329,7 +327,7 @@ scale = Vector2(1.5, 1.5)
 position = Vector2(-1, -1)
 scale = Vector2(4, 4)
 sprite_frames = SubResource("SpriteFrames_fjrip")
-animation = &"Dash"
+animation = &"Walk"
 autoplay = "Idle"
 
 [node name="Mana" parent="." unique_id=236815105 instance=ExtResource("3_mana")]
@@ -348,9 +346,6 @@ script = ExtResource("13_shoot")
 
 [node name="recoil" type="Node" parent="AbilitiesManager" unique_id=266335034]
 script = ExtResource("15_recoil")
-
-[node name="vdash" type="Node" parent="AbilitiesManager" unique_id=923373804]
-script = ExtResource("14_vdash")
 
 [node name="FirePoint" type="Node2D" parent="." unique_id=238434010]
 position = Vector2(24, -5)

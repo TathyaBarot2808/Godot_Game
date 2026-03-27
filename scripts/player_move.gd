@@ -59,7 +59,6 @@ const PROJECTILE_SCENE := preload("res://scenes/player_projectile_sc.tscn") # Lo
 @onready var fire_point: Node2D = $FirePoint                 # The physical point where bullets spawn
 @onready var shoot_effect: AnimatedSprite2D = $ShootEffectSprite # The visual black hole overlay
 @onready var _dash_comp: Node = $AbilitiesManager/dash       # Reference to the modular dash behavior
-@onready var _vdash: Node = $AbilitiesManager/vdash          # Reference to the vertical dash ability
 @onready var _recoil: Node = $AbilitiesManager/recoil        # Reference to the recoil ability
 
 var is_shooting_action_active: bool = false                  # True if the user pressed shoot and we are waiting for frame 4
@@ -89,8 +88,6 @@ func _ready() -> void:
 	if _dash_comp:
 		_dash_comp.dash_started.connect(_on_dash_started)
 		_dash_comp.dash_ended.connect(_on_dash_ended)
-	if _vdash:
-		_vdash.vdash_started.connect(_on_dash_started)
 
 	if shoot_effect != null:
 		shoot_effect.frame_changed.connect(_on_shoot_effect_frame_changed)
@@ -106,7 +103,6 @@ func _physics_process(delta: float) -> void:
 	_apply_gravity(delta)
 	
 	# --- INNATE ABILITIES (always available, not tied to loadout) ---
-	_handle_innate_dash()      # Shift key → 8-directional dash
 	_handle_innate_shoot()     # LMB → projectile with black hole effect
 	
 	# --- LOADOUT ABILITIES (future equippable skills) ---
@@ -122,41 +118,15 @@ func _physics_process(delta: float) -> void:
 
 # --- INNATE ABILITY HANDLERS ---
 
-# Dash: Fires on Shift, reads WASD for 8-directional input
-# Blocked when vdash is the active loadout ability (it handles Shift instead)
-func _handle_innate_dash() -> void:
-	if not Input.is_action_just_pressed("dash"):
-		return
-	if loadout.get_active_ability() == "vdash":
-		return  # vdash takes priority over innate dash
-	if not _dash_comp.can_use():
-		return
-	if not mana.can_spend(mana.dash_cost):
-		return
-
-	# Build an 8-directional vector from WASD
-	var dir := Vector2.ZERO
-	dir.x = Input.get_axis("move_left", "move_right")  # A/D → -1 / +1
-	dir.y = Input.get_axis("move_up", "move_down")      # W/S → -1 / +1
-
-	# If no keys are held, dash the way the sprite is facing
-	if dir == Vector2.ZERO:
-		dir = Vector2.LEFT if animated_sprite.flip_h else Vector2.RIGHT
-
-	var result = _dash_comp.trigger({"direction": dir})
-	if result is Vector2:
-		velocity = result
-	mana.spend(mana.dash_cost)
-
 # Shoot: Fires on LMB, always available regardless of loadout
 # Blocked when recoil is the active loadout ability (it handles LMB instead)
 func _handle_innate_shoot() -> void:
 	if not Input.is_action_just_pressed("shoot"):
 		return
-	if loadout.get_active_ability() == "recoil":
-		return  # recoil takes priority over innate shoot
-	if is_dashing or is_shooting_action_active:
-		return
+	# if loadout.get_active_ability() == "recoil":
+	# 	return  # recoil takes priority over innate shoot
+	# if is_dashing or is_shooting_action_active:
+	# 	return
 	if not mana.can_spend(mana.shoot_cost):
 		return
 
@@ -184,14 +154,14 @@ func _handle_loadout_ability() -> void:
 	var ability := loadout.get_active_ability()
 	match ability:
 		"recoil":
-			if Input.is_action_just_pressed("shoot"):
+			if Input.is_action_just_pressed("recoil"):
 				_execute_recoil()
-		"vdash":
+		"dash":
 			if Input.is_action_just_pressed("dash"):
-				_execute_vdash()
+				_execute_dash()
 
 func _execute_recoil() -> void:
-	if is_dashing or abilities.is_active("vdash"):
+	if is_dashing:
 		return
 	if not mana.can_spend(mana.shoot_cost):
 		return
@@ -204,17 +174,20 @@ func _execute_recoil() -> void:
 		mana.spend(mana.shoot_cost)
 		velocity = result
 
-func _execute_vdash() -> void:
-	if not mana.can_spend(mana.vdash_cost):
+func _execute_dash() -> void:
+	if not abilities.can_use("dash"):
 		return
-	var mouse_pos := get_global_mouse_position()
-	var dir := (mouse_pos - global_position).normalized()
+	if not mana.can_spend(mana.dash_cost):
+		return
+	var dir := Vector2.ZERO
+	dir.x = Input.get_axis("move_left", "move_right")
+	dir.y = Input.get_axis("move_up", "move_down")
 	if dir == Vector2.ZERO:
-		dir = Vector2.UP
-	var result: Variant = abilities.execute("vdash", {"direction": dir})
-	if result != null:
-		mana.spend(mana.vdash_cost)
+		dir = Vector2.LEFT if animated_sprite.flip_h else Vector2.RIGHT
+	var result: Variant = abilities.execute("dash", {"direction": dir})
+	if result is Vector2:
 		velocity = result
+	mana.spend(mana.dash_cost)
 
 func _on_dash_started() -> void:
 	is_dashing = true
@@ -241,7 +214,7 @@ func _tick_jump_buffer(delta: float) -> void:
 		jump_buffer_timer -= delta
 
 func _apply_gravity(delta: float) -> void:
-	if is_on_floor() or is_dashing or abilities.is_active("vdash") or abilities.is_active("recoil"):
+	if is_on_floor() or is_dashing or abilities.is_active("recoil"):
 		return
 
 	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
@@ -253,8 +226,6 @@ func _apply_gravity(delta: float) -> void:
 	elif velocity.y > 0:
 		current_gravity *= FALL_GRAVITY_MULTIPLIER
 
-	if _vdash.is_recovering():
-		current_gravity *= _vdash.get_recovery_factor()
 	if _recoil.is_recovering():
 		current_gravity *= _recoil.get_recovery_factor()
 
@@ -271,7 +242,7 @@ func _handle_jump() -> void:
 		coyote_timer = 0.0
 
 func _handle_movement(delta: float) -> void:
-	if is_dashing or abilities.is_active("vdash") or abilities.is_active("recoil"):
+	if is_dashing or abilities.is_active("recoil"):
 		return
 
 	var direction := Input.get_axis("move_left", "move_right")
