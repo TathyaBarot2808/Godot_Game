@@ -11,6 +11,7 @@ extends Node2D
 @export var shoot_cost: float = 5.0        # Mana consumed when firing a bullet (0 = free, shoot anytime)
 @export var dash_cost: float = 15.0        # Mana consumed when dashing
 @export var recoil_cost: float = 30.0      # Mana consumed when using recoil
+@export var walljump_cost: float = 10.0    # Mana consumed when using wall jump
 
 # A "signal" is like a radio broadcast. When mana changes, this fires off a message.
 # The HUD script is listening to this radio station, so it knows when to update the UI bar!

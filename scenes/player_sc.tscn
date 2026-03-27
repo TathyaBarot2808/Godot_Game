@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cfso8m4titi25" path="res://assets/Player_Sprite-sheet.png" id="2_g2els"]
 [ext_resource type="PackedScene" uid="uid://ng0hy5sgafi4" path="res://scenes/mana_sc.tscn" id="3_mana"]
 [ext_resource type="Texture2D" uid="uid://de6ne8nac6fgl" path="res://assets/Player_Shoot_Animation.png" id="5_orbwo"]
+[ext_resource type="Script" uid="uid://bfkxasgib3k13" path="res://scripts/walljump.gd" id="9_vaact"]
 [ext_resource type="Script" uid="uid://02ay3kn372ei" path="res://scripts/abilities_manager.gd" id="10_abilities"]
 [ext_resource type="Script" uid="uid://bh4m007p25rw2" path="res://scripts/loadout.gd" id="11_loadout"]
 [ext_resource type="Script" uid="uid://kq34llptxc8b" path="res://scripts/dash_component.gd" id="12_dash"]
@@ -315,12 +316,10 @@ shape = SubResource("RectangleShape2D_acmti")
 [node name="RayCastLeft" type="RayCast2D" parent="." unique_id=582561956]
 position = Vector2(-22, -52)
 target_position = Vector2(0, -10)
-enabled = true
 
 [node name="RayCastRight" type="RayCast2D" parent="." unique_id=1237382877]
 position = Vector2(22, -52)
 target_position = Vector2(0, -10)
-enabled = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=237484025]
 position = Vector2(-2, -3)
@@ -345,6 +344,9 @@ script = ExtResource("13_shoot")
 
 [node name="recoil" type="Node" parent="AbilitiesManager" unique_id=266335034]
 script = ExtResource("15_recoil")
+
+[node name="walljump" type="Node" parent="AbilitiesManager" unique_id=1815538869]
+script = ExtResource("9_vaact")
 
 [node name="FirePoint" type="Node2D" parent="." unique_id=238434010]
 position = Vector2(14.855, -3.8)
