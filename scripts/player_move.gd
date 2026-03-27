@@ -15,9 +15,13 @@ extends CharacterBody2D
 @export var AIR_ACCELERATION: float = 1800.0 # How quickly the player can change direction in the air
 @export var AIR_DECELERATION: float = 800.0  # How quickly the player stops in the air
 
+@export_group("Wall Slide")
+@export var WALL_SLIDE_MAX_FALL_SPEED: float = 260.0      # Cap fall speed while sliding on a wall
+@export var WALL_SLIDE_GRAVITY_MULTIPLIER: float = 0.35   # Reduce gravity while wall sliding
+
 @export_group("Advanced Jump Mechanics")
 @export var BASE_GRAVITY_MULTIPLIER: float = 1.5      # Normal gravity pulling the player down
-@export var VARIABLE_JUMP_MULTIPLIER: float = 0.4      # Slices upward speed if the player lets go of jump early (short hop!)
+@export var VARIABLE_JUMP_MULTIPLIER: float = 0.1    # Slices upward speed if the player lets go of jump early (short hop!)
 @export var JUMP_BUFFER_TIME: float = 0.1             # Time window to remember a jump press before hitting the ground
 @export var COYOTE_TIME: float = 0.1                  # Time window to allow a jump AFTER walking off a ledge
 @export var MAX_FALL_SPEED: float = 2000.0            # Terminal velocity (stops the player from falling infinitely fast)
@@ -35,6 +39,7 @@ extends CharacterBody2D
 
 @export_group("Corner Correction")
 @export var CORNER_CORRECTION_AMOUNT: float = 4.0     # How many pixels to nudge the player if they barely hit their head on a ceiling corner
+@export var ENABLE_CORNER_CORRECTION: bool = false    # Disable by default until raycasts are perfectly tuned
 
 # -------------------------------------------------------------------------
 # INTERNAL STATE VARIABLES (Hidden from the Inspector)
@@ -42,6 +47,7 @@ extends CharacterBody2D
 var jump_buffer_timer: float = 0.0  # Counts down the jump buffer
 var coyote_timer: float = 0.0       # Counts down coyote time
 var is_dashing: bool = false        # Simple True/False check to see if we are currently dashing
+var is_wall_sliding: bool = false
 
 @onready var abilities: AbilitiesManager = $AbilitiesManager
 @onready var loadout: LoadoutManager = $AbilitiesManager/LoadoutManager
@@ -208,8 +214,10 @@ func _tick_jump_buffer(delta: float) -> void:
 
 func _apply_gravity(delta: float) -> void:
 	if is_on_floor() or is_dashing or abilities.is_active("recoil"):
+		is_wall_sliding = false
 		return
 
+	is_wall_sliding = _should_wall_slide()
 	var current_gravity := get_gravity() * BASE_GRAVITY_MULTIPLIER
 	if Input.is_action_just_released("jump") and velocity.y < 0:
 		velocity.y *= VARIABLE_JUMP_MULTIPLIER
@@ -219,13 +227,17 @@ func _apply_gravity(delta: float) -> void:
 	elif velocity.y > 0:
 		current_gravity *= FALL_GRAVITY_MULTIPLIER
 
+	if is_wall_sliding:
+		current_gravity *= WALL_SLIDE_GRAVITY_MULTIPLIER
+
 	if _recoil.is_recovering():
 		current_gravity *= _recoil.get_recovery_factor()
 
 	velocity += current_gravity * delta
-	velocity.y = minf(velocity.y, MAX_FALL_SPEED)
+	var max_fall_speed := WALL_SLIDE_MAX_FALL_SPEED if is_wall_sliding else MAX_FALL_SPEED
+	velocity.y = minf(velocity.y, max_fall_speed)
 
-	if velocity.y < 0 and (left_raycast.is_colliding() or right_raycast.is_colliding()):
+	if ENABLE_CORNER_CORRECTION and velocity.y < 0 and (left_raycast.is_colliding() or right_raycast.is_colliding()):
 		_handle_corner_correction()
 
 func _handle_jump() -> void:
@@ -285,10 +297,42 @@ func _update_animation_and_sync() -> void:
 		shoot_effect.position.y = SHOOT_EFFECT_BASE_Y + y_off
 
 func _handle_corner_correction() -> void:
-	if left_raycast.is_colliding() and not right_raycast.is_colliding():
-		global_position.x += CORNER_CORRECTION_AMOUNT
-	elif right_raycast.is_colliding() and not left_raycast.is_colliding():
-		global_position.x -= CORNER_CORRECTION_AMOUNT
+	# Corner correction should only help with head-corner bonks.
+	# If we're already touching a side wall, skip it to avoid horizontal clipping.
+	if is_on_wall():
+		return
+
+	var left_hit := left_raycast.is_colliding()
+	var right_hit := right_raycast.is_colliding()
+	if left_hit == right_hit:
+		return
+
+	var nudge := CORNER_CORRECTION_AMOUNT if left_hit else -CORNER_CORRECTION_AMOUNT
+	# Never apply correction if that nudge would collide.
+	if not test_move(global_transform, Vector2(nudge, 0.0)):
+		global_position.x += nudge
+
+func _should_wall_slide() -> bool:
+	if is_on_floor():
+		return false
+	if not is_on_wall():
+		return false
+	if velocity.y <= 0.0:
+		return false
+	return _is_pressing_towards_wall()
+
+func _is_pressing_towards_wall() -> bool:
+	var input_x := Input.get_axis("move_left", "move_right")
+	if abs(input_x) < 0.1:
+		return false
+	var wall_normal := get_wall_normal()
+	if wall_normal.x > 0.1:
+		# Wall is on the player's left side.
+		return input_x < 0.0
+	if wall_normal.x < -0.1:
+		# Wall is on the player's right side.
+		return input_x > 0.0
+	return false
 
 # --- SHOOT EFFECT HANDLERS ---
 
