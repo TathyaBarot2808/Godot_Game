@@ -60,6 +60,7 @@ var stored_shoot_direction: Vector2 = Vector2.ZERO
 @onready var right_raycast: RayCast2D = $RayCastRight
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var mana: Node2D = $Mana
+@onready var health: HealthComponent = $Health
 @onready var fire_point: Node2D = $FirePoint
 @onready var shoot_effect: AnimatedSprite2D = $ShootEffectSprite
 @onready var _dash_comp: Node = $AbilitiesManager/dash

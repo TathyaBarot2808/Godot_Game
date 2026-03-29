@@ -5,6 +5,8 @@ extends CanvasLayer
 # @onready grabs these UI elements from the scene as soon as the HUD is created
 @onready var mana_bar: ProgressBar = $ManaContainer/ManaBar
 @onready var mana_label: Label = $ManaContainer/ManaLabel
+@onready var health_bar: ProgressBar = $HealthContainer/HealthBar
+@onready var health_label: Label = $HealthContainer/HealthLabel
 
 # Array of the 3 slot Panel nodes for easy looping
 @onready var _slots: Array = [
@@ -24,6 +26,14 @@ func setup(mana_node: Node) -> void:
 	# We manually refresh the UI once at the very start so it doesn't appear empty
 	_refresh(mana_node.current_mana, mana_node.max_mana)
 
+func setup_health(health_node: Node) -> void:
+	health_node.health_changed.connect(_on_health_changed)
+	_refresh_health(health_node.current_health, health_node.max_health)
+	
+func _on_health_changed(current: float, max_value: float) -> void:
+	_refresh_health(current, max_value)
+
+
 # This function runs automatically every time the player's mana goes up or down
 func _on_mana_changed(current: float, max_value: float) -> void:
 	_refresh(current, max_value)
@@ -35,6 +45,14 @@ func _refresh(current: float, max_value: float) -> void:
 	
 	# %d means "insert a whole number here". This writes e.g., "Mana: 85 / 100"
 	mana_label.text = "Mana: %d / %d" % [current, max_value]
+
+
+
+func _refresh_health(current: float, max_value: float) -> void:
+	health_bar.max_value = max_value
+	health_bar.value = current
+	health_label.text = "Health: %d / %d" % [current, max_value]
+	
 
 # --- Loadout Setup (Modular Ability System) ---
 

@@ -12,9 +12,9 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 20.0
-offset_top = -80.0
+offset_top = -133.63501
 offset_right = 240.0
-offset_bottom = -20.0
+offset_bottom = -73.63501
 grow_vertical = 0
 
 [node name="ManaBar" type="ProgressBar" parent="ManaContainer" unique_id=1645879893]
@@ -122,4 +122,37 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "---"
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HealthContainer" type="Control" parent="." unique_id=826929185]
+custom_minimum_size = Vector2(220, 60)
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -68.0
+offset_right = 240.0
+offset_bottom = -8.0
+grow_vertical = 0
+
+[node name="HealthBar" type="ProgressBar" parent="HealthContainer" unique_id=529929602]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 35.0
+offset_bottom = 62.0
+grow_horizontal = 2
+step = 1.0
+value = 100.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="HealthContainer" unique_id=1299631532]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 30.0
+grow_horizontal = 2
+text = "Health: 100 / 100"
 vertical_alignment = 1

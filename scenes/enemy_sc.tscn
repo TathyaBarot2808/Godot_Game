@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://dcvnx7nq3eiaw"]
+
+[ext_resource type="Texture2D" uid="uid://bdg3c8fyxoxxy" path="res://assets/Enemy/slime_green.png" id="1_4aj8l"]
+[ext_resource type="PackedScene" uid="uid://075khp826fvb" path="res://scenes/health_sc.tscn" id="2_o0x7t"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wjxkw"]
+atlas = ExtResource("1_4aj8l")
+region = Rect2(0, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ngm7w"]
+atlas = ExtResource("1_4aj8l")
+region = Rect2(24, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qwexe"]
+atlas = ExtResource("1_4aj8l")
+region = Rect2(48, 24, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f64kl"]
+atlas = ExtResource("1_4aj8l")
+region = Rect2(72, 24, 24, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_uylc1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wjxkw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ngm7w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qwexe")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f64kl")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_44pq4"]
+size = Vector2(15, 13)
+
+[node name="EnemySc" type="Node2D" unique_id=1547827226]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1675961808]
+sprite_frames = SubResource("SpriteFrames_uylc1")
+animation = &"idle"
+frame_progress = 0.98617053
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=198228936]
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1877756592]
+position = Vector2(-0.5, 5.5)
+shape = SubResource("RectangleShape2D_44pq4")
+
+[node name="HealthComponent" parent="." unique_id=1365412678 instance=ExtResource("2_o0x7t")]
+max_health = 30.0
+auto_destroy_owner = true

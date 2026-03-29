@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://kq34llptxc8b" path="res://scripts/dash_component.gd" id="12_dash"]
 [ext_resource type="Script" uid="uid://s45plqefiv7" path="res://scripts/shoot_component.gd" id="13_shoot"]
 [ext_resource type="Script" uid="uid://cjkt10dyt51sx" path="res://scripts/recoil_component.gd" id="15_recoil"]
+[ext_resource type="PackedScene" uid="uid://075khp826fvb" path="res://scenes/health_sc.tscn" id="16_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_acmti"]
 size = Vector2(55, 117)
@@ -329,6 +330,9 @@ animation = &"Walk"
 autoplay = "Idle"
 
 [node name="Mana" parent="." unique_id=236815105 instance=ExtResource("3_mana")]
+
+[node name="Health" parent="." unique_id=236815106 instance=ExtResource("16_health")]
+max_health = 88.675
 
 [node name="AbilitiesManager" type="Node" parent="." unique_id=999001]
 script = ExtResource("10_abilities")
