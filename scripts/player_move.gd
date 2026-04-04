@@ -85,6 +85,7 @@ var chest_y_offsets: Dictionary = {
 # Lifecycle
 # -----------------------------------------------------------------------------
 func _ready() -> void:
+	add_to_group("player")
 	if _dash_comp:
 		_dash_comp.dash_started.connect(_on_dash_started)
 		_dash_comp.dash_ended.connect(_on_dash_ended)
@@ -127,7 +128,7 @@ func _handle_innate_shoot() -> void:
 	if started == true:
 		mana.spend(mana.shoot_cost)
 
-# -----------------------------------------------------------------------------
+# ------------------------d-----------------------------------------------------
 # Loadout Ability Handling
 # -----------------------------------------------------------------------------
 func _handle_slot_switch() -> void:

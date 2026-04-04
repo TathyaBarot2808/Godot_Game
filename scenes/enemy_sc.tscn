@@ -2,6 +2,23 @@
 
 [ext_resource type="Texture2D" uid="uid://bdg3c8fyxoxxy" path="res://assets/Enemy/slime_green.png" id="1_4aj8l"]
 [ext_resource type="PackedScene" uid="uid://075khp826fvb" path="res://scenes/health_sc.tscn" id="2_o0x7t"]
+[ext_resource type="Script" uid="uid://bfit7c7p704nw" path="res://scripts/enemy.gd" id="3_enemy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uylc1"]
+atlas = ExtResource("1_4aj8l")
+region = Rect2(48, 48, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ftler"]
+atlas = ExtResource("1_4aj8l")
+region = Rect2(48, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r6gwm"]
+atlas = ExtResource("1_4aj8l")
+region = Rect2(24, 0, 24, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fg7kq"]
+atlas = ExtResource("1_4aj8l")
+region = Rect2(0, 0, 24, 24)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wjxkw"]
 atlas = ExtResource("1_4aj8l")
@@ -23,6 +40,23 @@ region = Rect2(72, 24, 24, 24)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_uylc1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ftler")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r6gwm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fg7kq")
+}],
+"loop": false,
+"name": &"Die",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_wjxkw")
 }, {
 "duration": 1.0,
@@ -42,21 +76,23 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_44pq4"]
 size = Vector2(15, 13)
 
-[node name="EnemySc" type="Node2D" unique_id=1547827226]
+[node name="EnemySc" type="CharacterBody2D" unique_id=659245497]
+scale = Vector2(4, 4)
+collision_layer = 2
+collision_mask = 7
+script = ExtResource("3_enemy")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1675961808]
 sprite_frames = SubResource("SpriteFrames_uylc1")
-animation = &"idle"
-frame_progress = 0.98617053
-
-[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=198228936]
-collision_layer = 4
-collision_mask = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1877756592]
-position = Vector2(-0.5, 5.5)
-shape = SubResource("RectangleShape2D_44pq4")
+animation = &"Die"
+autoplay = "idle"
+frame = 3
+frame_progress = 1.0
 
 [node name="HealthComponent" parent="." unique_id=1365412678 instance=ExtResource("2_o0x7t")]
 max_health = 30.0
 auto_destroy_owner = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1877756592]
+position = Vector2(-0.5, 5.5)
+shape = SubResource("RectangleShape2D_44pq4")

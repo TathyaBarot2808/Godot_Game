@@ -306,7 +306,7 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D" unique_id=167515670]
-collision_layer = 2
+collision_layer = 10
 collision_mask = 5
 script = ExtResource("1_g2els")
 
@@ -332,7 +332,6 @@ autoplay = "Idle"
 [node name="Mana" parent="." unique_id=236815105 instance=ExtResource("3_mana")]
 
 [node name="Health" parent="." unique_id=236815106 instance=ExtResource("16_health")]
-max_health = 88.675
 
 [node name="AbilitiesManager" type="Node" parent="." unique_id=999001]
 script = ExtResource("10_abilities")

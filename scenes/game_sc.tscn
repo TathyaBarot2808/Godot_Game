@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://liy58p781tw7" path="res://assets/Dungeon Tile Set.png" id="2_iynk6"]
 [ext_resource type="PackedScene" uid="uid://c8wvjnp6dx5al" path="res://scenes/hud.tscn" id="3_hud"]
 [ext_resource type="Script" uid="uid://db0ibg2vxor83" path="res://scripts/game.gd" id="4_game"]
+[ext_resource type="PackedScene" uid="uid://dcvnx7nq3eiaw" path="res://scenes/enemy_sc.tscn" id="5_3l2eu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cn2eb"]
 texture = ExtResource("2_iynk6")
@@ -232,3 +233,6 @@ tile_map_data = PackedByteArray("AAD3/wQAAAABAAEAAAD4/wQAAAACAAEAAAD5/wQAAAACAAE
 tile_set = SubResource("TileSet_sj5te")
 
 [node name="HUD" parent="." unique_id=496745851 instance=ExtResource("3_hud")]
+
+[node name="EnemySc" parent="." unique_id=1547827226 instance=ExtResource("5_3l2eu")]
+position = Vector2(364, 77)
