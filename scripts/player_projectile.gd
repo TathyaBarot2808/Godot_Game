@@ -6,6 +6,7 @@ extends Area2D
 # Speed of the bullet in pixels per second. 
 # @export lets you change this number directly in the Godot inspector.
 @export var speed: float = 800.0
+@export var damage: float = 10.0
 
 # The direction the bullet will travel. This is set by the player when fired.
 var direction: Vector2 = Vector2.RIGHT
@@ -22,11 +23,13 @@ func _on_body_entered(body: Node2D) -> void:
 	# A safety check: if the bullet somehow spawns touching the player, ignore it completely.
 	if body.name == "Player":
 		return
-		
-	# If the thing we hit has a function called "take_damage" (like an enemy would),
-	# tell that enemy to take 10 damage!
-	if body.has_method("take_damage"):
-		body.take_damage(10)
+
+	# Prefer reusable HealthComponent; fallback to legacy take_damage methods.
+	var health := _find_health_component(body)
+	if health != null:
+		health.take_damage(damage)
+	elif body.has_method("take_damage"):
+		body.take_damage(damage)
 		
 	# queue_free() tells Godot to delete this bullet from the game permanently
 	queue_free()
@@ -35,3 +38,14 @@ func _on_body_entered(body: Node2D) -> void:
 func _on_visible_on_screen_notifier_2d_screen_exited() -> void:
 	# We delete the bullet so it doesn't fly through empty space forever taking up memory!
 	queue_free()
+
+func _find_health_component(start_node: Node) -> HealthComponent:
+	var current: Node = start_node
+	while current != null:
+		if current is HealthComponent:
+			return current as HealthComponent
+		for child in current.get_children():
+			if child is HealthComponent:
+				return child as HealthComponent
+		current = current.get_parent()
+	return null

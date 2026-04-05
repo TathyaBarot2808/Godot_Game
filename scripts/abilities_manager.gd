@@ -6,6 +6,7 @@ var _unlocked: Dictionary = {
 	"shoot": true,   # innate projectile shoot
 	"dash":  true,   # loadout ability — 8-directional dash
 	"recoil": true,  # loadout slot 0 — launch away from mouse
+	"walljump": true # loadout slot 1 — jump off walls
 }
 
 # Populated automatically in _ready from child AbilityBase nodes
