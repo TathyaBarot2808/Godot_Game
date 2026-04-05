@@ -2,8 +2,8 @@ extends AbilityBase
 
 @export_group("Dash Settings")
 @export var DASH_SPEED: float = 1200.0
-@export var DASH_DURATION: float = 0.12
-@export var DASH_COOLDOWN: float = 0.15
+@export var DASH_DURATION: float = 0.05
+@export var DASH_COOLDOWN: float = 0.3
 
 signal dash_started
 signal dash_ended

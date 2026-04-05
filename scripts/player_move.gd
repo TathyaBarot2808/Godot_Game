@@ -70,7 +70,7 @@ var stored_shoot_direction: Vector2 = Vector2.ZERO           # Remembers exactly
 # up or down so it matches the bouncy breathing of the base pixel art frame by frame!
 # -------------------------------------------------------------------------
 var chest_y_offsets: Dictionary = {
-	"Idle": [0, 1, 4, 5, 4, 1, 0], # 7 frames
+	"Idle": [2, 4, 6, 7, 6, 4, 2], # 7 frames
 	"Walk": [0, 1, 0, 0, 0, 1, 0, 0, 0, 0], # 10 frames
 	"Jump": [-3, -2, -1, 1, 2, 3], # 6 frames
 	"Fall": [-5, -6], # 2 frames

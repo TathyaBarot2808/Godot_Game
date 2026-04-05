@@ -4,12 +4,12 @@
 
 ```
 GAME STARTS
-     │
-     ▼
+	 │
+	 ▼
 game_sc.tscn (the level)
-     ├── Player          ← the character you control
-     ├── TileMapLayer    ← the floor/walls
-     └── HUD             ← the screen UI
+	 ├── Player          ← the character you control
+	 ├── TileMapLayer    ← the floor/walls
+	 └── HUD             ← the screen UI
 ```
 
 ---
@@ -22,7 +22,7 @@ var speed = 600.0
 
 # func = a function (does something)
 func jump():
-    velocity.y = -1000.0
+	velocity.y = -1000.0
 
 # @export = shows in the Inspector panel in Godot editor (change without touching code)
 @export var SPEED: float = 600.0
@@ -55,22 +55,22 @@ class_name AbilitiesManager
 ```
 game_sc.tscn
 └── Scene1 (Node2D)                     ← game.gd
-    ├── Player (CharacterBody2D)        ← player_move.gd
-    │   ├── CollisionShape2D            ← hitbox
-    │   ├── RayCastLeft                 ← corner correction sensor
-    │   ├── RayCastRight                ← corner correction sensor
-    │   ├── AnimatedSprite2D            ← sprite + all animations
-    │   ├── Mana (Node2D)               ← mana.gd
-    │   └── AbilitiesManager (Node)     ← abilities_manager.gd
-    │       ├── recoil (Node)           ← recoil_component.gd
-    │       ├── dash (Node)             ← dash_component.gd
-    │       └── LoadoutManager (Node)   ← loadout.gd
-    ├── Camera2D                        ← follows player
-    ├── TileMapLayer                    ← the level tiles
-    └── HUD (CanvasLayer)               ← hud.gd
-        └── ManaContainer
-            ├── ManaBar (ProgressBar)
-            └── ManaLabel (Label)
+	├── Player (CharacterBody2D)        ← player_move.gd
+	│   ├── CollisionShape2D            ← hitbox
+	│   ├── RayCastLeft                 ← corner correction sensor
+	│   ├── RayCastRight                ← corner correction sensor
+	│   ├── AnimatedSprite2D            ← sprite + all animations
+	│   ├── Mana (Node2D)               ← mana.gd
+	│   └── AbilitiesManager (Node)     ← abilities_manager.gd
+	│       ├── recoil (Node)           ← recoil_component.gd
+	│       ├── dash (Node)             ← dash_component.gd
+	│       └── LoadoutManager (Node)   ← loadout.gd
+	├── Camera2D                        ← follows player
+	├── TileMapLayer                    ← the level tiles
+	└── HUD (CanvasLayer)               ← hud.gd
+		└── ManaContainer
+			├── ManaBar (ProgressBar)
+			└── ManaLabel (Label)
 ```
 
 ---
@@ -155,8 +155,8 @@ Shoot pressed + dash in active slot
 
 ```gdscript
 var _unlocked = {
-    "recoil": true,   # true = player can use it
-    "dash":   true,   # false = locked, can't use even if in loadout
+	"recoil": true,   # true = player can use it
+	"dash":   true,   # false = locked, can't use even if in loadout
 }
 ```
 
@@ -256,7 +256,7 @@ When mana_changed fires:
 
 ```gdscript
 func _ready():
-    hud.setup(player.mana)   # connect HUD → player's mana node
+	hud.setup(player.mana)   # connect HUD → player's mana node
 ```
 
 That's it. One line.
