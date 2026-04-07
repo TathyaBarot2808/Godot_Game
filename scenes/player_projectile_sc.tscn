@@ -46,34 +46,34 @@ region = Rect2(288, 0, 32, 32)
 [sub_resource type="SpriteFrames" id="SpriteFrames_qfl01"]
 animations = [{
 "frames": [{
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_umcbn")
 }, {
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_kfeqt")
 }, {
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_8brw0")
 }, {
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_wq7w0")
 }, {
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_u572c")
 }, {
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_net65")
 }, {
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_hrhsd")
 }, {
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_ac1aw")
 }, {
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_ypyp8")
 }, {
-"duration": 0.5,
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_ku8wa")
 }],
 "loop": true,
@@ -118,6 +118,7 @@ scale = Vector2(-0.9158157, 0.5676068)
 rect = Rect2(-8.819583, -10.519427, 16.780682, 20.519428)
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=247966453]
+position = Vector2(2, 0)
 amount = 50
 lifetime = 1.5
 preprocess = 2.5

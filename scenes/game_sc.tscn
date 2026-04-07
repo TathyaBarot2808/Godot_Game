@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://c8wvjnp6dx5al" path="res://scenes/hud.tscn" id="3_hud"]
 [ext_resource type="Script" uid="uid://db0ibg2vxor83" path="res://scripts/game.gd" id="4_game"]
 [ext_resource type="PackedScene" uid="uid://dcvnx7nq3eiaw" path="res://scenes/enemy_sc.tscn" id="5_3l2eu"]
+[ext_resource type="Script" uid="uid://dm74kwdaimbxw" path="res://scripts/camera_follow.gd" id="5_camera"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cn2eb"]
 texture = ExtResource("2_iynk6")

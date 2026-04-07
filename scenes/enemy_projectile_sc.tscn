@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://d3m3lnrv0gg3g"]
+
+[ext_resource type="Texture2D" uid="uid://bmdl8qolckya4" path="res://assets/Enemy_Projectile_Sprite.png" id="1_hi3uv"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yodc8"]
+atlas = ExtResource("1_hi3uv")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bbkip"]
+atlas = ExtResource("1_hi3uv")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j5g8c"]
+atlas = ExtResource("1_hi3uv")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7f6re"]
+atlas = ExtResource("1_hi3uv")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m1kpb"]
+atlas = ExtResource("1_hi3uv")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1e6ei"]
+atlas = ExtResource("1_hi3uv")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ilx3q"]
+atlas = ExtResource("1_hi3uv")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tcgu3"]
+atlas = ExtResource("1_hi3uv")
+region = Rect2(224, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_sg2fn"]
+animations = [{
+"frames": [{
+"duration": 0.4,
+"texture": SubResource("AtlasTexture_yodc8")
+}, {
+"duration": 0.4,
+"texture": SubResource("AtlasTexture_bbkip")
+}, {
+"duration": 0.4,
+"texture": SubResource("AtlasTexture_j5g8c")
+}, {
+"duration": 0.4,
+"texture": SubResource("AtlasTexture_7f6re")
+}, {
+"duration": 0.4,
+"texture": SubResource("AtlasTexture_m1kpb")
+}, {
+"duration": 0.4,
+"texture": SubResource("AtlasTexture_1e6ei")
+}, {
+"duration": 0.4,
+"texture": SubResource("AtlasTexture_ilx3q")
+}, {
+"duration": 0.4,
+"texture": SubResource("AtlasTexture_tcgu3")
+}],
+"loop": false,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g1u1l"]
+size = Vector2(20, 8.75)
+
+[sub_resource type="Gradient" id="Gradient_gkag4"]
+offsets = PackedFloat32Array(0.5, 0.8596059)
+colors = PackedColorArray(0.9137255, 0.24705882, 0.34901962, 1, 1, 1, 1, 1)
+
+[node name="Area2D" type="Area2D" unique_id=589445869]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1943522478]
+sprite_frames = SubResource("SpriteFrames_sg2fn")
+frame = 7
+frame_progress = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1526730606]
+position = Vector2(4, 0)
+scale = Vector2(1, 1.0685204)
+shape = SubResource("RectangleShape2D_g1u1l")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="." unique_id=418684543]
+position = Vector2(11, 0)
+amount = 12
+explosiveness = 0.1
+randomness = 0.5
+emission_shape = 3
+emission_rect_extents = Vector2(1, 5)
+gravity = Vector2(100, 0)
+linear_accel_min = 11.9
+linear_accel_max = 11.9
+angle_min = -360.0
+angle_max = 360.0
+scale_amount_max = 1.5
+color_ramp = SubResource("Gradient_gkag4")
+anim_speed_max = 10.67
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1503206929]
+position = Vector2(4, 0)
+scale = Vector2(1, -0.47999954)
