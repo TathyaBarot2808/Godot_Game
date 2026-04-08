@@ -105,7 +105,7 @@ script = ExtResource("1_script")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1319218041]
 sprite_frames = SubResource("SpriteFrames_qfl01")
 animation = &"Fired"
-frame_progress = 0.42309272
+frame_progress = 0.88692874
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1589747999]
 position = Vector2(-7.6, 0)
