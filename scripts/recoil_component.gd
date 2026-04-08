@@ -2,7 +2,7 @@ extends AbilityBase
 
 @export_group("Shotgun Recoil")
 @export var RECOIL_SPEED: float = 1500.0
-@export var RECOIL_DURATION: float = 0.2
+@export var RECOIL_DURATION: float = 0.1
 @export var RECOIL_GRAVITY_RECOVERY: float = 0.15
 
 var _recoil_timer: float = 0.0
