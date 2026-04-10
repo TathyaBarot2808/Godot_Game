@@ -66,25 +66,20 @@ var stored_shoot_direction: Vector2 = Vector2.ZERO
 @onready var _dash_comp: Node = $AbilitiesManager/dash
 @onready var _recoil: Node = $AbilitiesManager/recoil
 
-# -------------------------------------------------------------------------
-# ANIMATION SYNC DICTIONARY
-# This tells the script how many pixels to shove the black hole (and bullet spawn) 
-# up or down so it matches the bouncy breathing of the base pixel art frame by frame!
-# -------------------------------------------------------------------------
-var chest_y_offsets: Dictionary = {
-	"Idle": [2, 4, 6, 7, 6, 4, 2], # 7 frames
-	"Walk": [0, 1, 0, 0, 0, 1, 0, 0, 0, 0], # 10 frames
-	"Jump": [-3, -2, -1, 1, 2, 3], # 6 frames
-	"Fall": [-5, -6], # 2 frames
-	"Dash": [0, 0, 0, 0, 0] # 5 frames
-}
-
 # -----------------------------------------------------------------------------
 # Constants / Data
 # -----------------------------------------------------------------------------
 const PROJECTILE_SCENE := preload("res://scenes/player_projectile_sc.tscn")
 const FIRE_POINT_BASE_Y: float = -5.0
 const SHOOT_EFFECT_BASE_Y: float = 3.0
+
+var chest_y_offsets: Dictionary = {
+	"Idle": [0, 1, 4, 5, 4, 1, 0],
+	"Walk": [0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+	"Jump": [-3, -2, -1, 1, 2, 3],
+	"Fall": [-5, -6],
+	"Dash": [0, 0, 0, 0, 0]
+}
 
 # -----------------------------------------------------------------------------
 # Lifecycle
@@ -277,7 +272,7 @@ func _handle_movement(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0.0, decel * delta)
 
 	if animated_sprite.flip_h:
-		fire_point.position.x = - abs(fire_point.position.x)
+		fire_point.position.x = -abs(fire_point.position.x)
 		if shoot_effect:
 			shoot_effect.flip_h = true
 	else:
@@ -357,6 +352,8 @@ func _on_shoot_effect_frame_changed() -> void:
 	elif shoot_effect.frame == 7:
 		shoot_effect.hide()
 		shoot_effect.stop()
+
+	 
 
 func _on_shoot_effect_animation_finished() -> void:
 	shoot_effect.hide()

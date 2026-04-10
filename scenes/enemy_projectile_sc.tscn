@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://d3m3lnrv0gg3g"]
 
 [ext_resource type="Texture2D" uid="uid://bmdl8qolckya4" path="res://assets/Enemy_Projectile_Sprite.png" id="1_hi3uv"]
+[ext_resource type="Script" uid="uid://b6pcko8cvwrjs" path="res://scripts/enemy_projectile.gd" id="1_yodc8"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yodc8"]
 atlas = ExtResource("1_hi3uv")
@@ -74,6 +75,9 @@ offsets = PackedFloat32Array(0.5, 0.8596059)
 colors = PackedColorArray(0.9137255, 0.24705882, 0.34901962, 1, 1, 1, 1, 1)
 
 [node name="Area2D" type="Area2D" unique_id=589445869]
+collision_layer = 16
+collision_mask = 3
+script = ExtResource("1_yodc8")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1943522478]
 sprite_frames = SubResource("SpriteFrames_sg2fn")

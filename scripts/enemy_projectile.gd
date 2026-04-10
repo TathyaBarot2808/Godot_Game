@@ -20,9 +20,8 @@ func _physics_process(delta: float) -> void:
 
 # This function triggers automatically the moment the Area2D overlaps a physics body
 func _on_body_entered(body: Node2D) -> void:
-	add_to_group("bullet")
 	# A safety check: if the bullet somehow spawns touching the player, ignore it completely.
-	if body.name == "Player":
+	if body.is_in_group("enemy1"):
 		return
 
 	# Prefer reusable HealthComponent; fallback to legacy take_damage methods.

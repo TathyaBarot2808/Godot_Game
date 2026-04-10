@@ -14,6 +14,7 @@ func _ready() -> void:
 
 # This is called by the AbilitiesManager when you click Shoot
 func trigger(_args: Dictionary) -> Variant:
+	add_to_group("bullet")
 	if player == null:
 		return false
 	var direction: Vector2 = _args.get("direction", Vector2.ZERO)
