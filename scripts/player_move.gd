@@ -39,10 +39,17 @@ extends CharacterBody2D
 @export var WALK_ANIMATION_MIN_SCALE: float = 0.85
 @export var WALK_ANIMATION_MAX_SCALE: float = 2.2
 
+@export_group("Hit Feedback")
+@export var player_hit_flash_color: Color = Color(1.0, 0.45, 0.45, 1.0)
+@export var player_hit_flash_duration: float = 0.08
+@export var player_hit_shake_strength: float = 6.0
+@export var player_hit_shake_duration: float = 0.14
+
 var jump_buffer_timer: float = 0.0
 var coyote_timer: float = 0.0
 var is_dashing: bool = false
 var is_wall_sliding: bool = false
+var _hit_flash_tween: Tween = null
 
 var is_shooting_action_active: bool = false
 var stored_shoot_direction: Vector2 = Vector2.ZERO
@@ -56,6 +63,7 @@ var stored_shoot_direction: Vector2 = Vector2.ZERO
 @onready var mana: Node2D = $Mana
 @onready var health: HealthComponent = $Health
 @onready var camera_follow: Camera2D = $Camera2D
+@onready var hit_particles: CPUParticles2D = $HitParticles
 @onready var fire_point: Node2D = $FirePoint
 @onready var shoot_effect: AnimatedSprite2D = $ShootEffectSprite
 @onready var _dash_comp: Node = $AbilitiesManager/dash
@@ -112,6 +120,12 @@ func _handle_innate_shoot() -> void:
 		return
 
 	var direction := (get_global_mouse_position() - fire_point.global_position).normalized()
+	#if direction.x < 0:
+		#animated_sprite.flip_h = true
+	#elif direction.x > 0:
+		#animated_sprite.flip_h = false
+
+	
 	var started: Variant = abilities.execute("shoot", {"direction": direction})
 	if started == true:
 		mana.spend(mana.shoot_cost)
@@ -191,8 +205,16 @@ func _on_dash_ended() -> void:
 	pass
 
 func _on_player_damaged(amount: float, current: float, max_value: float) -> void:
+	if hit_particles != null:
+		hit_particles.restart()
+		hit_particles.emitting = true
+	if is_instance_valid(_hit_flash_tween):
+		_hit_flash_tween.kill()
+	animated_sprite.modulate = player_hit_flash_color
+	_hit_flash_tween = create_tween()
+	_hit_flash_tween.tween_property(animated_sprite, "modulate", Color.WHITE, player_hit_flash_duration)
 	if camera_follow != null and camera_follow.has_method("shake"):
-		camera_follow.shake()
+		camera_follow.shake(player_hit_shake_strength, player_hit_shake_duration)
 
 func _tick_coyote(delta: float) -> void:
 	if is_on_floor():

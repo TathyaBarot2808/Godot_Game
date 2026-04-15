@@ -47,6 +47,7 @@ func _shoot() -> void:
 	get_parent().add_child(projectile)
 	projectile.global_position = shoot_point.global_position
 	projectile.direction = (player.global_position - shoot_point.global_position).normalized()
+	
 	projectile.rotation = projectile.direction.angle() + PI
 	_shoot_timer = 0.0
 
@@ -106,8 +107,8 @@ func _play_hit_flash() -> void:
 		return
 	if is_instance_valid(_hit_flash_tween):
 		_hit_flash_tween.kill()
-	animated_sprite.modulate = hit_flash_color
-	_hit_flash_tween = create_tween()
+	animated_sprite.modulate = hit_flash_color #Tint color applied on top of the sprite
+	_hit_flash_tween = create_tween() # Creating new tween object which is something that smoothly changes a value overtime
 	_hit_flash_tween.tween_property(animated_sprite, "modulate", Color.WHITE, hit_flash_duration)
 
 func _shake_player_camera() -> void:
