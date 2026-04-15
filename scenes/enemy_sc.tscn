@@ -8,26 +8,6 @@
 atlas = ExtResource("2_qwexe")
 region = Rect2(64, 64, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_r6gwm"]
-atlas = ExtResource("2_qwexe")
-region = Rect2(32, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fg7kq"]
-atlas = ExtResource("2_qwexe")
-region = Rect2(64, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_3bqr2"]
-atlas = ExtResource("2_qwexe")
-region = Rect2(96, 32, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_bjsaf"]
-atlas = ExtResource("2_qwexe")
-region = Rect2(0, 64, 32, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2td0t"]
-atlas = ExtResource("2_qwexe")
-region = Rect2(32, 64, 32, 32)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_qwexe"]
 atlas = ExtResource("2_qwexe")
 region = Rect2(0, 0, 32, 32)
@@ -44,7 +24,7 @@ region = Rect2(64, 0, 32, 32)
 atlas = ExtResource("2_qwexe")
 region = Rect2(96, 0, 32, 32)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_aalry"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_r6gwm"]
 atlas = ExtResource("2_qwexe")
 region = Rect2(0, 32, 32, 32)
 
@@ -56,26 +36,6 @@ animations = [{
 }],
 "loop": false,
 "name": &"Die",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_r6gwm")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fg7kq")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_3bqr2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_bjsaf")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_2td0t")
-}],
-"loop": true,
-"name": &"Shoot",
 "speed": 5.0
 }, {
 "frames": [{
@@ -92,7 +52,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_ftler")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_aalry")
+"texture": SubResource("AtlasTexture_r6gwm")
 }],
 "loop": true,
 "name": &"idle",
@@ -100,7 +60,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_44pq4"]
-size = Vector2(32.75, 18.75)
+size = Vector2(15, 13)
 
 [node name="EnemySc" type="CharacterBody2D" unique_id=659245497]
 scale = Vector2(4, 4)
@@ -110,17 +70,16 @@ script = ExtResource("3_enemy")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1675961808]
 sprite_frames = SubResource("SpriteFrames_uylc1")
-animation = &"Shoot"
+animation = &"idle"
 autoplay = "idle"
-frame_progress = 0.6407271
+
+[node name="ShootPoint" type="Marker2D" parent="." unique_id=1514472201]
+position = Vector2(-1.25, 5.25)
 
 [node name="HealthComponent" parent="." unique_id=1365412678 instance=ExtResource("2_o0x7t")]
 max_health = 30.0
 auto_destroy_owner = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1877756592]
-position = Vector2(0.125, 2.125)
+position = Vector2(-0.5, 5.5)
 shape = SubResource("RectangleShape2D_44pq4")
-
-[node name="ShootPoint" type="Node2D" parent="." unique_id=1741971884]
-position = Vector2(-1.25, 5.25)

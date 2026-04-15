@@ -16,8 +16,15 @@ extends Camera2D
 @export var X_VELOCITY_THRESHOLD: float = 80.0   # Min horizontal speed to trigger horizontal look-ahead
 @export var Y_VELOCITY_THRESHOLD: float = 80.0   # Min vertical speed to trigger vertical look-ahead
 
+
+@export_group("Camera Shake")
+@export var HIT_SHAKE_STRENGTH: float = 14.0
+@export var HIT_SHAKE_DURATION: float = 0.18
+@export var SHAKE_DECAY: float = 20.0
+
 var _target_offset: Vector2 = Vector2.ZERO
 
+	
 func _physics_process(delta: float) -> void:
 	var player: CharacterBody2D = get_parent() as CharacterBody2D
 	if player == null:

@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShotgunCeleste — Game Ideas & Vision Board</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --bg-deep: #0a0a12;
+    --bg-card: #12121f;
+    --bg-card-hover: #1a1a2e;
+    --border-glow: #2a2a4a;
+    --accent-blue: #4a9eff;
+    --accent-purple: #9b59ff;
+    --accent-magenta: #ff4a9b;
+    --accent-green: #4aff9b;
+    --accent-gold: #ffd700;
+    --accent-orange: #ff9b4a;
+    --text-primary: #e8e8f0;
+    --text-secondary: #8888aa;
+    --text-muted: #555570;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      linear-gradient(rgba(74,158,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,158,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: -1;
+    animation: gridScroll 20s linear infinite;
+  }
+
+  @keyframes gridScroll {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(40px, 40px); }
+  }
+
+  /* Floating particles */
+  .particles {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 0.4; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  /* Hero Section */
+  .hero {
+    position: relative;
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(transparent, var(--bg-deep));
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    animation: pulseGlow 6s ease-in-out infinite;
+  }
+  .hero-glow.blue { background: var(--accent-blue); top: -100px; left: 20%; }
+  .hero-glow.purple { background: var(--accent-purple); top: -50px; right: 15%; animation-delay: 2s; }
+  .hero-glow.magenta { background: var(--accent-magenta); bottom: 0; left: 40%; animation-delay: 4s; }
+
+  @keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 0.12; }
+    50% { transform: scale(1.2); opacity: 0.2; }
+  }
+
+  .hero h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple), var(--accent-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 0 60px rgba(74,158,255,0.3);
+    animation: titleShimmer 4s ease-in-out infinite;
+  }
+
+  @keyframes titleShimmer {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+  }
+
+  .hero .subtitle {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 30px;
+  }
+
+  .graph-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(74,158,255,0.1);
+    border: 1px solid rgba(74,158,255,0.3);
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    color: var(--accent-blue);
+    position: relative;
+    z-index: 1;
+  }
+  .graph-badge .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-green);
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Stats Row */
+  .stats-row {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0 0;
+    position: relative;
+    z-index: 1;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Navigation */
+  .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,18,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-glow);
+  }
+  .nav-tab {
+    padding: 10px 20px;
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .nav-tab:hover, .nav-tab.active {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: rgba(74,158,255,0.08);
+    box-shadow: 0 0 20px rgba(74,158,255,0.1);
+  }
+
+  /* Main Content */
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  /* Section Header */
+  .section {
+    margin-bottom: 60px;
+    scroll-margin-top: 80px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  .section-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
+    line-height: 1.6;
+  }
+  .section-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  /* Color themes per section */
+  .theme-rpg .section-icon { background: linear-gradient(135deg, rgba(155,89,255,0.2), rgba(155,89,255,0.05)); color: var(--accent-purple); }
+  .theme-rpg .section-title { color: var(--accent-purple); }
+  .theme-content .section-icon { background: linear-gradient(135deg, rgba(74,255,155,0.2), rgba(74,255,155,0.05)); color: var(--accent-green); }
+  .theme-content .section-title { color: var(--accent-green); }
+  .theme-improve .section-icon { background: linear-gradient(135deg, rgba(74,158,255,0.2), rgba(74,158,255,0.05)); color: var(--accent-blue); }
+  .theme-improve .section-title { color: var(--accent-blue); }
+  .theme-features .section-icon { background: linear-gradient(135deg, rgba(255,74,155,0.2), rgba(255,74,155,0.05)); color: var(--accent-magenta); }
+  .theme-features .section-title { color: var(--accent-magenta); }
+  .theme-play .section-icon { background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,215,0,0.05)); color: var(--accent-gold); }
+  .theme-play .section-title { color: var(--accent-gold); }
+
+  /* Idea Cards */
+  .ideas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  .idea-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .idea-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--card-accent), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .idea-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--card-accent);
+    background: var(--bg-card-hover);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 30px color-mix(in srgb, var(--card-accent) 15%, transparent);
+  }
+  .idea-card:hover::before { opacity: 1; }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .card-emoji {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+  }
+  .card-title {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  .card-body {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .card-body strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* Tags */
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .tag {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tag-graph { background: rgba(74,158,255,0.12); color: var(--accent-blue); border: 1px solid rgba(74,158,255,0.2); }
+  .tag-effort-low { background: rgba(74,255,155,0.12); color: var(--accent-green); border: 1px solid rgba(74,255,155,0.2); }
+  .tag-effort-med { background: rgba(255,215,0,0.12); color: var(--accent-gold); border: 1px solid rgba(255,215,0,0.2); }
+  .tag-effort-high { background: rgba(255,74,155,0.12); color: var(--accent-magenta); border: 1px solid rgba(255,74,155,0.2); }
+  .tag-priority { background: rgba(155,89,255,0.12); color: var(--accent-purple); border: 1px solid rgba(155,89,255,0.2); }
+
+  /* Connections callout */
+  .graph-insight {
+    background: rgba(74,158,255,0.06);
+    border: 1px solid rgba(74,158,255,0.15);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    font-size: 0.8rem;
+    color: var(--accent-blue);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .graph-insight .gi-icon { flex-shrink: 0; font-size: 1rem; }
+
+  /* Full-width feature cards */
+  .idea-card.featured {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(155,89,255,0.05), rgba(74,158,255,0.05));
+    border-color: rgba(155,89,255,0.2);
+  }
+  .idea-card.featured:hover {
+    border-color: var(--accent-purple);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border-glow);
+  }
+
+  @media (max-width: 768px) {
+    .ideas-grid { grid-template-columns: 1fr; }
+    .stats-row { gap: 20px; }
+    .nav-tabs { gap: 6px; padding: 12px; }
+    .nav-tab { padding: 8px 14px; font-size: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow blue"></div>
+  <div class="hero-glow purple"></div>
+  <div class="hero-glow magenta"></div>
+
+  <h1>ShotgunCeleste</h1>
+  <p class="subtitle">
+    Game improvement ideas generated from a knowledge graph analysis of the full codebase,
+    architecture docs, visual assets, roadmap, and scene tree.
+  </p>
+  <div class="graph-badge">
+    <span class="dot"></span>
+    Powered by Knowledge Graph — 175 nodes · 220 edges · 18 communities
+  </div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">16</div><div class="stat-label">Scripts</div></div>
+    <div class="stat"><div class="stat-num">8</div><div class="stat-label">Scenes</div></div>
+    <div class="stat"><div class="stat-num">9</div><div class="stat-label">Sprites</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Abilities</div></div>
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Phases</div></div>
+  </div>
+</section>
+
+<!-- NAV -->
+<nav class="nav-tabs">
+  <button class="nav-tab active" onclick="scrollToSection('rpg-feel')">🎭 RPG Look & Feel</button>
+  <button class="nav-tab" onclick="scrollToSection('new-content')">🗺️ New Content</button>
+  <button class="nav-tab" onclick="scrollToSection('improve')">⚡ Improve Current</button>
+  <button class="nav-tab" onclick="scrollToSection('features')">🔧 New Features</button>
+  <button class="nav-tab" onclick="scrollToSection('play-modes')">🎮 New Ways to Play</button>
+</nav>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: RPG LOOK & FEEL             -->
+  <!-- ═══════════════════════════════════════ -->
+  <section class="section theme-rpg" id="rpg-feel">
+    <div class="section-header">
+      <div class="section-icon">🎭</div>
+      <div>
+        <div class="section-title">RPG Look & Feel</div>
+        <div class="section-desc">Transform the game from a platformer prototype into a dungeon-crawling RPG that players can lose themselves in</div>
+      </div>
+    </div>
+
+    <div class="ideas-grid">
+
+      <div class="idea-card featured" style="--card-accent: var(--accent-purple);">
+        <div class="card-header">
+          <div class="card-emoji">🌑</div>
+          <div class="card-title">Dynamic Dungeon Lighting System</div>
+        </div>
+        <div class="card-body">
+          Your dungeon tileset already has <strong>chandeliers, windows, and torches</strong> — but they don't cast light. Add a 2D lighting system using Godot's <code>PointLight2D</code> and <code>CanvasModulate</code> to create a dark dungeon atmosphere where only torches and windows illuminate the space. The player can carry a faint glow that reveals nearby tiles, making exploration feel tense and rewarding. Add flickering animations to the chandelier lights.
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> The "Dungeon Tileset Props" community has chandelier, window, and cage nodes — all natural light source candidates. These are currently disconnected from the gameplay communities, meaning the environment is purely decorative. Lighting bridges that gap.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">High Impact</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-purple);">
+        <div class="card-header">
+          <div class="card-emoji">📊</div>
+          <div class="card-title">Player Stats & Leveling</div>
+        </div>
+        <div class="card-body">
+          Your <strong>HealthComponent</strong> already has signals for <code>damaged</code>, <code>healed</code>, and <code>died</code>. Extend this with an XP/leveling system: enemies drop XP on death, gaining levels increases <strong>max_health</strong> and <strong>max_mana</strong>. This gives dungeon-crawling a purpose beyond just surviving — players grind rooms to power up before harder areas.
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> HealthComponent (9 edges, God Node #5) and Mana System (7 edges) are core hubs. A leveling system wires directly into both, amplifying their importance naturally.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-purple);">
+        <div class="card-header">
+          <div class="card-emoji">💬</div>
+          <div class="card-title">NPC Dialogue & Lore System</div>
+        </div>
+        <div class="card-body">
+          Place caged NPCs (your tileset has <strong>prison cages</strong>) throughout the dungeon who give cryptic hints about upcoming rooms, enemy weaknesses, or the dungeon's story. Use a simple dialogue box that appears over the HUD layer. Even 2-3 lines per NPC makes the dungeon feel <em>alive</em> and gives context to why the player is there.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Tileset Props</span>
+          <span class="tag tag-effort-low">Low Effort</span>
+          <span class="tag tag-priority">High Impact</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-purple);">
+        <div class="card-header">
+          <div class="card-emoji">🎒</div>
+          <div class="card-title">Inventory & Item Pickups</div>
+        </div>
+        <div class="card-body">
+          Your tileset has <strong>treasure chests, barrels, and shelves</strong> — make them interactable! Chests drop items (health potions, mana crystals, ability scrolls). Add a simple inventory panel to the HUD. Items can be one-time-use consumables at first, then expand to equipable gear later. The existing <strong>LoadoutManager</strong> architecture (3 slots) already supports this pattern.
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> LoadoutManager has 3 empty slots by design (all set to ""). This was intentional for "future equippable special abilities" — items are the natural evolution of this system.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-purple);">
+        <div class="card-header">
+          <div class="card-emoji">🎵</div>
+          <div class="card-title">Atmospheric Audio Design</div>
+        </div>
+        <div class="card-body">
+          Add layered ambient audio: <strong>dripping water echoes</strong> in empty rooms, <strong>distant rumbles</strong> near enemy clusters, <strong>eerie wind</strong> through windows. Music should be dynamic — quiet exploration themes that intensify when enemies are nearby. Each ability should have a distinct, satisfying SFX: the recoil should <em>boom</em>, the dash should <em>whoosh</em>, projectiles should <em>sizzle</em>.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">High Impact</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-purple);">
+        <div class="card-header">
+          <div class="card-emoji">✨</div>
+          <div class="card-title">Particle Effects & Screen Juice</div>
+        </div>
+        <div class="card-body">
+          The roadmap already mentions <strong>recoil screen shake</strong> and <strong>dash particle burst</strong> — double down on this. Add: dust clouds on landing, speed lines during dash, mana sparkles when regenerating, hit flash on enemies, death particles (pixel dissolve), glowing ability icons when off-cooldown. Use <code>GPUParticles2D</code> for all of these. This is what makes the game <em>feel</em> like a real RPG.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Roadmap Phase 1</span>
+          <span class="tag tag-effort-low">Low Effort</span>
+          <span class="tag tag-priority">High Impact</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-purple);">
+        <div class="card-header">
+          <div class="card-emoji">🗡️</div>
+          <div class="card-title">Parallax Dungeon Backgrounds</div>
+        </div>
+        <div class="card-body">
+          Add 3-4 parallax layers behind the TileMapLayer: <strong>distant stone arches</strong>, <strong>mid-ground cobwebs and chains</strong>, and <strong>foreground fog/mist</strong>. Use Godot's <code>ParallaxBackground</code> node. This gives the dungeon depth and atmosphere far beyond what flat tiles can achieve. The dark blue-purple palette from the tileset should carry through to these layers.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Roadmap Phase 6</span>
+          <span class="tag tag-effort-low">Low Effort</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-purple);">
+        <div class="card-header">
+          <div class="card-emoji">🎨</div>
+          <div class="card-title">HUD Overhaul with RPG Elements</div>
+        </div>
+        <div class="card-body">
+          The current HUD has mana bar, health bar, and loadout slots — make them <em>gorgeous</em>. Add ornamental dungeon-themed borders (stone/metal), animated mana fluid inside the bar, a glowing health heart, and small ability icons in the loadout slots with cooldown sweeps. Add a minimap in the corner showing explored rooms. Show the current floor/room number.
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> The "HUD & UI System" community (14 nodes) is already signal-driven and well-wired to mana, health, and loadout. Visual overhaul is pure cosmetic work on top of solid architecture.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: NEW CONTENT                 -->
+  <!-- ═══════════════════════════════════════ -->
+  <section class="section theme-content" id="new-content">
+    <div class="section-header">
+      <div class="section-icon">🗺️</div>
+      <div>
+        <div class="section-title">New Content to Add</div>
+        <div class="section-desc">Expand the dungeon world with enemies, biomes, bosses, and abilities that leverage your modular architecture</div>
+      </div>
+    </div>
+
+    <div class="ideas-grid">
+
+      <div class="idea-card featured" style="--card-accent: var(--accent-green);">
+        <div class="card-header">
+          <div class="card-emoji">👾</div>
+          <div class="card-title">Full Enemy Roster (5 Enemy Types)</div>
+        </div>
+        <div class="card-body">
+          You currently have <strong>Flying Eye</strong> and <strong>Green Slime</strong> sprites. Build 5 distinct enemy archetypes that force different playstyles:
+          <br><br>
+          <strong>1. Stalker</strong> — ground enemy that chases the player, vulnerable to recoil knockback<br>
+          <strong>2. Anchor</strong> — stationary turret that shoots at the player, must dash-dodge its projectiles<br>
+          <strong>3. Charger</strong> — lunges across the room when player is in line-of-sight, punishes standing still<br>
+          <strong>4. Reflector</strong> — bounces player projectiles back, must be defeated with recoil melee or environmental damage<br>
+          <strong>5. Bouncer</strong> — flying enemy that ricochets off walls, creates chaos in enclosed rooms
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> The roadmap Phase 4 already lists these 5 types. Your enemy.gd already has patrol, chase, and attack states. The HealthComponent + take_damage() pattern means new enemies just need new AI scripts extending a shared base.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Roadmap Phase 4</span>
+          <span class="tag tag-effort-high">High Effort</span>
+          <span class="tag tag-priority">Core Content</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-green);">
+        <div class="card-header">
+          <div class="card-emoji">⚡</div>
+          <div class="card-title">4 New Loadout Abilities</div>
+        </div>
+        <div class="card-body">
+          The 3 empty loadout slots need abilities! Your <strong>AbilityBase</strong> pattern makes this plug-and-play:
+          <br><br>
+          <strong>Blink</strong> — short-range teleport to mouse position (15 mana)<br>
+          <strong>Time Slow</strong> — 3-second bullet-time for precise dodging (30 mana)<br>
+          <strong>Gravity Flip</strong> — invert gravity for 2 seconds, walk on ceilings (25 mana)<br>
+          <strong>Shield Bash</strong> — brief invincibility + knockback on contact (20 mana)
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> The "Modular Ability System" hyperedge (7 nodes, confidence 1.0) proves the architecture is ready. Each new ability just extends AbilityBase and implements trigger(), can_use(), is_active().</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Roadmap Phase 5</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Core Content</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-green);">
+        <div class="card-header">
+          <div class="card-emoji">🏰</div>
+          <div class="card-title">Multiple Dungeon Biomes</div>
+        </div>
+        <div class="card-body">
+          Your current tileset is a <strong>dark stone dungeon</strong>. Add 2-3 more biomes that re-use the same tile structure but with different art:
+          <br><br>
+          <strong>Crypt</strong> — green-tinted, bones and cobwebs, undead enemies<br>
+          <strong>Forge</strong> — orange lava glow, metal platforms, fire traps<br>
+          <strong>Abyss</strong> — deep purple void, floating platforms, gravity anomalies<br>
+          <br>
+          Each biome introduces one new environmental mechanic that synergizes with abilities.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-high">High Effort</span>
+          <span class="tag tag-priority">Long-term</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-green);">
+        <div class="card-header">
+          <div class="card-emoji">💀</div>
+          <div class="card-title">Dungeon Boss Encounters</div>
+        </div>
+        <div class="card-body">
+          End each biome with a boss fight in a large arena room. Bosses should test mastery of that biome's mechanics:
+          <br><br>
+          <strong>The Warden</strong> — dungeon boss, summons slimes, has a cage-slam attack. Must be defeated by recoiling into its weak spot while it's stunned.<br>
+          <strong>The Furnace</strong> — forge boss, lava floor rises, must dash across safe platforms while dodging fire projectiles.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-high">High Effort</span>
+          <span class="tag tag-priority">Long-term</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-green);">
+        <div class="card-header">
+          <div class="card-emoji">🗝️</div>
+          <div class="card-title">Key & Lock Progression</div>
+        </div>
+        <div class="card-body">
+          Your tileset has <strong>doors, ladders, and fences</strong>. Use them as progression gates! Colored keys unlock matching doors, ladders connect vertical room layers, fences block shortcuts until destroyed. This gives dungeon exploration a Metroidvania-like structure where abilities also serve as "keys" (e.g., gravity flip to reach a ceiling passage).
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> "Dungeon Structural Tile Elements" hyperedge connects walls, floors, doors, and ladders — all unused in gameplay. This idea activates that entire community.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-green);">
+        <div class="card-header">
+          <div class="card-emoji">📜</div>
+          <div class="card-title">Ability Unlock Orbs</div>
+        </div>
+        <div class="card-body">
+          Place glowing orbs in secret or challenge rooms that unlock new abilities via <code>abilities_manager.unlock()</code>. The player starts with only recoil/shoot + dash, and discovers new abilities through exploration. Each orb has a short tutorial room after it where the player must use the new ability to proceed — teaching by geometry, not text.
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> AbilitiesManager._unlocked dictionary already gates abilities. The unlock() method exists. This is pure content design on top of existing architecture.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-low">Low Effort</span>
+          <span class="tag tag-priority">High Impact</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-green);">
+        <div class="card-header">
+          <div class="card-emoji">🪤</div>
+          <div class="card-title">Environmental Traps & Hazards</div>
+        </div>
+        <div class="card-body">
+          Add spike floors, swinging axes, arrow traps, and collapsing platforms to dungeon rooms. These work as both obstacles and tools — recoil can launch you over spikes, dash can pass through arrow volleys, and enemies can be lured into traps. Uses the same <strong>HealthComponent.take_damage()</strong> pattern for both player and enemies.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: IMPROVE CURRENT CONTENT     -->
+  <!-- ═══════════════════════════════════════ -->
+  <section class="section theme-improve" id="improve">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <div>
+        <div class="section-title">Improve Current Content</div>
+        <div class="section-desc">Polish and elevate what already exists — these have the highest return-on-investment</div>
+      </div>
+    </div>
+
+    <div class="ideas-grid">
+
+      <div class="idea-card featured" style="--card-accent: var(--accent-blue);">
+        <div class="card-header">
+          <div class="card-emoji">🎯</div>
+          <div class="card-title">Recoil — Make It Feel Like a Shotgun</div>
+        </div>
+        <div class="card-body">
+          Recoil is your <strong>signature mechanic</strong> and the game's identity. Right now it's functional but needs to feel <em>amazing</em>:
+          <br><br>
+          <strong>Screen shake</strong> — 0.1s shake scaled to recoil speed<br>
+          <strong>Muzzle flash</strong> — your shoot animation already has frames, but add a brief <code>PointLight2D</code> flash<br>
+          <strong>Recoil trail</strong> — ghost sprites or motion blur during the recoil flight<br>
+          <strong>Impact dust</strong> — particles on landing after a recoil<br>
+          <strong>Camera zoom pulse</strong> — slight zoom-out during recoil, zoom-in on landing<br>
+          <strong>Hitstop</strong> — 2-frame pause when recoil hits an enemy, makes combat feel weighty
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> Recoil Component connects to Player Controller, Mana System, AbilityBase, and the shoot animation — it's the most cross-cutting mechanic. Improving it amplifies 4+ graph communities simultaneously.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">God Node Adjacent</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Critical</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-blue);">
+        <div class="card-header">
+          <div class="card-emoji">💨</div>
+          <div class="card-title">Dash — Add Afterimage & I-Frames</div>
+        </div>
+        <div class="card-body">
+          The 8-directional dash is technically solid but visually flat. Add:
+          <br><br>
+          <strong>Afterimage trail</strong> — 3-4 fading ghost sprites left behind during dash<br>
+          <strong>I-frames</strong> — invincibility during dash duration (0.12s)<br>
+          <strong>Dash through enemies</strong> — if dashing into an enemy during I-frames, deal small damage<br>
+          <strong>Burst particles</strong> — at dash start and end points
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Roadmap Phase 1</span>
+          <span class="tag tag-effort-low">Low Effort</span>
+          <span class="tag tag-priority">High Impact</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-blue);">
+        <div class="card-header">
+          <div class="card-emoji">🦅</div>
+          <div class="card-title">Enemy AI — Smarter Behaviors</div>
+        </div>
+        <div class="card-body">
+          Your enemy.gd has <strong>patrol, chase, and attack</strong> states — improve each:
+          <br><br>
+          <strong>Patrol</strong>: Add idle pauses where the enemy looks around (animation variety)<br>
+          <strong>Chase</strong>: Use pathfinding instead of direct movement, enemies navigate around obstacles<br>
+          <strong>Attack</strong>: Telegraphed attacks with a brief wind-up animation so players can react<br>
+          <strong>Death</strong>: Pixel dissolve animation + item drop chance instead of instant disappear
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-blue);">
+        <div class="card-header">
+          <div class="card-emoji">💎</div>
+          <div class="card-title">Mana — Visual Feedback & Economy</div>
+        </div>
+        <div class="card-body">
+          Mana regen is invisible. Make it <em>feel</em> satisfying:
+          <br><br>
+          <strong>Regen sparkles</strong> — particles on the player during mana regen<br>
+          <strong>Low mana warning</strong> — screen edge tint + bar flash when below 20%<br>
+          <strong>Empty mana punishment</strong> — ability attempts with no mana play a "fail" sound + brief stutter<br>
+          <strong>Mana pickups</strong> — enemies drop mana crystals, rewarding aggressive play<br>
+          <strong>Balance pass</strong>: shoot_cost (5) feels too cheap vs dash_cost (15) — consider 10/20 to make resource management matter more
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> Mana System is a God Node (7 edges) connecting to 4 different ability components via shares_data_with edges. It's the resource backbone — making it feel better improves ALL abilities.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">God Node</span>
+          <span class="tag tag-effort-low">Low Effort</span>
+          <span class="tag tag-priority">High Impact</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-blue);">
+        <div class="card-header">
+          <div class="card-emoji">📸</div>
+          <div class="card-title">Camera — Smarter Follow & Effects</div>
+        </div>
+        <div class="card-body">
+          Your camera_follow.gd has look-ahead. Improve it with:
+          <br><br>
+          <strong>Room-locked camera</strong> — snap camera to room boundaries in room-based layouts<br>
+          <strong>Combat zoom</strong> — slight zoom-in during enemy encounters<br>
+          <strong>Recoil camera lead</strong> — camera anticipates recoil direction for better visibility<br>
+          <strong>Smooth transitions</strong> — lerp between room cameras instead of instant snapping
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-low">Low Effort</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-blue);">
+        <div class="card-header">
+          <div class="card-emoji">🔄</div>
+          <div class="card-title">Death & Respawn Loop</div>
+        </div>
+        <div class="card-body">
+          Currently there's no death/respawn system. This is the single most important missing piece for a playable demo:
+          <br><br>
+          <strong>Death animation</strong> — player dissolves into pixels<br>
+          <strong>Quick restart</strong> — instant respawn at last checkpoint (Celeste-style)<br>
+          <strong>Checkpoint crystals</strong> — placed at room entrances, touching one saves progress<br>
+          <strong>Death counter</strong> — show total deaths on HUD (embraces difficulty like Celeste)
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> The "died" signal exists in HealthComponent but is connected to nothing. This is a graph dead-end that needs to be wired to a respawn system.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Signal Unwired</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Critical</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-blue);">
+        <div class="card-header">
+          <div class="card-emoji">🎬</div>
+          <div class="card-title">Player Animation Polish</div>
+        </div>
+        <div class="card-body">
+          Your sprite sheet has walk, idle, damage, and directional frames. Add:
+          <br><br>
+          <strong>Squash & stretch</strong> — compress on landing, stretch on jump start<br>
+          <strong>Animation blending</strong> — smooth transitions between states instead of instant swaps<br>
+          <strong>Wall slide pose</strong> — dedicated animation for wall sliding (walljump.gd exists)<br>
+          <strong>Hurt animation</strong> — the damage frame exists in the sprite sheet but needs to be connected to the damaged signal
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-low">Low Effort</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: NEW FEATURES                -->
+  <!-- ═══════════════════════════════════════ -->
+  <section class="section theme-features" id="features">
+    <div class="section-header">
+      <div class="section-icon">🔧</div>
+      <div>
+        <div class="section-title">New Features to Implement</div>
+        <div class="section-desc">Systems-level features that deepen gameplay and add replayability</div>
+      </div>
+    </div>
+
+    <div class="ideas-grid">
+
+      <div class="idea-card featured" style="--card-accent: var(--accent-magenta);">
+        <div class="card-header">
+          <div class="card-emoji">🏗️</div>
+          <div class="card-title">Procedural Room Generation</div>
+        </div>
+        <div class="card-body">
+          Instead of hand-placing every room, build a procedural dungeon generator:
+          <br><br>
+          <strong>Room templates</strong> — design 20-30 room "prefabs" with different layouts<br>
+          <strong>Connection system</strong> — rooms have entry/exit doors that snap together<br>
+          <strong>Difficulty scaling</strong> — deeper floors use harder room templates + more enemies<br>
+          <strong>Room types</strong> — combat rooms, treasure rooms, rest rooms, trap rooms, boss rooms<br>
+          <strong>Seed-based</strong> — same seed = same dungeon, enables sharing and speedrunning
+          <br><br>
+          This single feature turns a 10-minute demo into infinite replayability.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-high">High Effort</span>
+          <span class="tag tag-priority">Game-Changer</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-magenta);">
+        <div class="card-header">
+          <div class="card-emoji">💾</div>
+          <div class="card-title">Save & Persistence System</div>
+        </div>
+        <div class="card-body">
+          Save player progress between sessions using Godot's <code>ConfigFile</code> or JSON:
+          <br><br>
+          <strong>Save data:</strong> current checkpoint, unlocked abilities, equipped loadout, player level/XP, explored rooms, death count<br>
+          <strong>Auto-save</strong> on checkpoint touch<br>
+          <strong>Multiple save slots</strong> for different runs<br>
+          <strong>New Game+</strong> — restart with abilities unlocked, enemies harder
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Roadmap Phase 6</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Essential</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-magenta);">
+        <div class="card-header">
+          <div class="card-emoji">🎰</div>
+          <div class="card-title">Ability Synergy System</div>
+        </div>
+        <div class="card-body">
+          When specific abilities are in the loadout together, they gain bonus effects:
+          <br><br>
+          <strong>Recoil + Dash</strong> → "Meteor" — dash downward after recoil, area damage on impact<br>
+          <strong>Blink + Time Slow</strong> → "Freeze Frame" — blink leaves behind a time-slowed zone<br>
+          <strong>Gravity Flip + Recoil</strong> → "Ceiling Slam" — recoil while inverted deals 2x damage<br>
+          <br>
+          This makes loadout choice strategic instead of just "pick your 3 favorites."
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Unique</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-magenta);">
+        <div class="card-header">
+          <div class="card-emoji">🗺️</div>
+          <div class="card-title">Dungeon Minimap & Room Tracking</div>
+        </div>
+        <div class="card-body">
+          Add a minimap in the HUD corner that reveals rooms as the player enters them. Show icons for: current room, unexplored exits, boss rooms, treasure rooms, checkpoint rooms. This transforms aimless wandering into strategic exploration. Wire it into the existing <strong>HUD CanvasLayer</strong>.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">HUD System</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-magenta);">
+        <div class="card-header">
+          <div class="card-emoji">⏱️</div>
+          <div class="card-title">Speedrun Timer & Ghost System</div>
+        </div>
+        <div class="card-body">
+          Celeste is famous for speedrunning. Lean into this:
+          <br><br>
+          <strong>In-game timer</strong> — shows room time and total time on HUD<br>
+          <strong>Ghost replay</strong> — record your best run and race against it<br>
+          <strong>Room splits</strong> — show +/- time vs personal best per room<br>
+          <strong>Leaderboard</strong> — local leaderboard per seed (or online later)
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Community</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-magenta);">
+        <div class="card-header">
+          <div class="card-emoji">🎛️</div>
+          <div class="card-title">Ability Upgrade Tree</div>
+        </div>
+        <div class="card-body">
+          Each ability can be upgraded with XP/currency found in the dungeon:
+          <br><br>
+          <strong>Recoil Tier 2</strong> → bigger knockback + stun on enemies<br>
+          <strong>Recoil Tier 3</strong> → leaves a damaging trail during recoil flight<br>
+          <strong>Dash Tier 2</strong> → longer duration, dash through walls<br>
+          <strong>Dash Tier 3</strong> → chain dash (double-tap for second dash)
+          <br><br>
+          Uses the existing <code>@export</code> variables (RECOIL_SPEED, DASH_SPEED, etc.) — upgrade just adjusts the numbers and adds VFX.
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> Each ability component has @export tuning variables. An upgrade tree is just a data layer that modifies these exports at runtime — zero architecture changes needed.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Graph Connected</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-magenta);">
+        <div class="card-header">
+          <div class="card-emoji">🚪</div>
+          <div class="card-title">Main Menu & Pause Menu</div>
+        </div>
+        <div class="card-body">
+          Essential for any releasable game:
+          <br><br>
+          <strong>Main menu</strong> — animated dungeon background, Play / Continue / Settings / Quit<br>
+          <strong>Pause menu</strong> — Resume / Loadout / Settings / Quit to Menu<br>
+          <strong>Settings</strong> — volume sliders, screen shake toggle, control remapping<br>
+          <strong>Loadout screen</strong> — drag abilities into slots, see descriptions and mana costs
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Roadmap Phase 6</span>
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Essential</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: NEW WAYS TO PLAY            -->
+  <!-- ═══════════════════════════════════════ -->
+  <section class="section theme-play" id="play-modes">
+    <div class="section-header">
+      <div class="section-icon">🎮</div>
+      <div>
+        <div class="section-title">New Ways to Play</div>
+        <div class="section-desc">Alternative game modes that add variety and replayability beyond the main dungeon run</div>
+      </div>
+    </div>
+
+    <div class="ideas-grid">
+
+      <div class="idea-card featured" style="--card-accent: var(--accent-gold);">
+        <div class="card-header">
+          <div class="card-emoji">🔀</div>
+          <div class="card-title">Roguelite Mode</div>
+        </div>
+        <div class="card-body">
+          The ultimate "one more run" mode. Combine procedural generation with permadeath:
+          <br><br>
+          <strong>Start fresh</strong> — begin each run with only recoil + dash, basic health/mana<br>
+          <strong>Room rewards</strong> — choose one of 3 random ability unlocks after clearing a room<br>
+          <strong>Curse modifiers</strong> — optional hard-mode pickups (+damage dealt, −max health)<br>
+          <strong>Meta progression</strong> — permanent unlocks between runs (new abilities enter the pool, cosmetics)<br>
+          <strong>Daily challenge</strong> — one fixed seed per day, compete for best time/score
+          <br><br>
+          This transforms a linear dungeon into a game people play for hundreds of hours.
+        </div>
+        <div class="graph-insight">
+          <span class="gi-icon">🔗</span>
+          <span><strong>Graph insight:</strong> The abilities_manager._unlocked dictionary + loadout slot system is already designed for runtime ability unlocking. Roguelite mode is the natural endgame of this architecture.</span>
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-graph">Architecture Ready</span>
+          <span class="tag tag-effort-high">High Effort</span>
+          <span class="tag tag-priority">Game-Changer</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-gold);">
+        <div class="card-header">
+          <div class="card-emoji">🏋️</div>
+          <div class="card-title">Challenge Rooms</div>
+        </div>
+        <div class="card-body">
+          Standalone rooms accessible from a hub that test specific skills:
+          <br><br>
+          <strong>"Recoil Gauntlet"</strong> — navigate a spike-filled vertical shaft using only recoil<br>
+          <strong>"Dash Circuit"</strong> — speed run through a laser grid, must dash through gaps<br>
+          <strong>"Mana Crisis"</strong> — enemies keep spawning, mana doesn't regen — use abilities wisely<br>
+          <strong>"Ceiling Run"</strong> — entire room is inverted, use gravity flip to navigate<br>
+          <br>
+          Each room has bronze/silver/gold completion times and unlocks cosmetics.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Replayability</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-gold);">
+        <div class="card-header">
+          <div class="card-emoji">🏟️</div>
+          <div class="card-title">Arena / Survival Mode</div>
+        </div>
+        <div class="card-body">
+          A single large room where enemies spawn in waves of increasing difficulty:
+          <br><br>
+          <strong>Wave system</strong> — 10 waves, each harder with new enemy combinations<br>
+          <strong>Between waves</strong> — choose an ability upgrade or health restore<br>
+          <strong>Leaderboard</strong> — highest wave reached with each loadout combination<br>
+          <strong>Boss waves</strong> — every 5th wave is a mini-boss
+          <br><br>
+          Perfect for short play sessions and testing ability combos.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Replayability</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-gold);">
+        <div class="card-header">
+          <div class="card-emoji">🎭</div>
+          <div class="card-title">Modifier Mutations</div>
+        </div>
+        <div class="card-body">
+          Unlock game-changing modifiers that remix the base game:
+          <br><br>
+          <strong>"Glass Cannon"</strong> — 1 HP, but abilities deal 3x damage<br>
+          <strong>"Infinite Mana"</strong> — no mana cost, but no health regen<br>
+          <strong>"Chaos Loadout"</strong> — ability slots randomly change every 30 seconds<br>
+          <strong>"Pacifist"</strong> — projectiles don't deal damage, must use environment/recoil only<br>
+          <strong>"Speed Demon"</strong> — everything moves 2x faster, enemies and player alike
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-low">Low Effort</span>
+          <span class="tag tag-priority">Fun Factor</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-gold);">
+        <div class="card-header">
+          <div class="card-emoji">👥</div>
+          <div class="card-title">Local Co-op Mode</div>
+        </div>
+        <div class="card-body">
+          Add a second player with split or shared screen:
+          <br><br>
+          <strong>Player 2</strong> uses IJKL + mouse for movement and abilities<br>
+          <strong>Shared mana pool</strong> — forces communication about resource usage<br>
+          <strong>Combo abilities</strong> — both players recoil at the same target = massive damage<br>
+          <strong>Revive mechanic</strong> — downed player can be revived by standing near them
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-high">High Effort</span>
+          <span class="tag tag-priority">Long-term</span>
+        </div>
+      </div>
+
+      <div class="idea-card" style="--card-accent: var(--accent-gold);">
+        <div class="card-header">
+          <div class="card-emoji">🏆</div>
+          <div class="card-title">Achievement & Unlock System</div>
+        </div>
+        <div class="card-body">
+          Track player milestones and reward them with unlockables:
+          <br><br>
+          <strong>"Shotgun Surgeon"</strong> — Kill 100 enemies with recoil knockback<br>
+          <strong>"Untouchable"</strong> — Complete a floor without taking damage<br>
+          <strong>"Speed Demon"</strong> — Complete the dungeon in under 5 minutes<br>
+          <strong>"Ability Master"</strong> — Use every ability at least once in a single run<br>
+          <br>
+          Unlocks: character color palettes, trail effects, death animations, HUD themes.
+        </div>
+        <div class="card-tags">
+          <span class="tag tag-effort-med">Medium Effort</span>
+          <span class="tag tag-priority">Retention</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>Generated from knowledge graph analysis of ShotgunCeleste — 175 nodes · 220 edges · 18 communities</p>
+  <p style="margin-top: 8px; color: var(--text-muted);">Open <code>graphify-out/graph.html</code> for the interactive knowledge graph</p>
+</footer>
+
+<script>
+  // Generate floating particles
+  const container = document.getElementById('particles');
+  const colors = ['#4a9eff', '#9b59ff', '#ff4a9b', '#4aff9b', '#ffd700'];
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = Math.random() * 10 + 's';
+    container.appendChild(p);
+  }
+
+  // Navigation
+  function scrollToSection(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  // Highlight active nav on scroll
+  const sections = document.querySelectorAll('.section');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const sectionIds = ['rpg-feel', 'new-content', 'improve', 'features', 'play-modes'];
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = sectionIds.indexOf(entry.target.id);
+        if (idx !== -1) {
+          tabs.forEach(t => t.classList.remove('active'));
+          tabs[idx].classList.add('active');
+        }
+      }
+    });
+  }, { threshold: 0.2 });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Card stagger animation on scroll
+  const cards = document.querySelectorAll('.idea-card');
+  const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        cardObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  cards.forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+    cardObserver.observe(card);
+  });
+</script>
+
+</body>
+</html>

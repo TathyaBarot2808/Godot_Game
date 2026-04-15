@@ -61,6 +61,7 @@ var stored_shoot_direction: Vector2 = Vector2.ZERO
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var mana: Node2D = $Mana
 @onready var health: HealthComponent = $Health
+@onready var camera_follow: Camera2D = $Camera2D
 @onready var fire_point: Node2D = $FirePoint
 @onready var shoot_effect: AnimatedSprite2D = $ShootEffectSprite
 @onready var _dash_comp: Node = $AbilitiesManager/dash
@@ -89,6 +90,8 @@ func _ready() -> void:
 	if _dash_comp:
 		_dash_comp.dash_started.connect(_on_dash_started)
 		_dash_comp.dash_ended.connect(_on_dash_ended)
+	if health != null:
+		health.damaged.connect(_on_player_damaged)
 
 	if shoot_effect != null:
 		shoot_effect.frame_changed.connect(_on_shoot_effect_frame_changed)
@@ -205,6 +208,10 @@ func _on_dash_started() -> void:
 func _on_dash_ended() -> void:
 	# Dash movement ends here; animation finish drives dash-state release.
 	pass
+
+func _on_player_damaged(amount: float, current: float, max_value: float) -> void:
+	if camera_follow != null and camera_follow.has_method("shake"):
+		camera_follow.shake()
 
 # -----------------------------------------------------------------------------
 # Movement / Physics

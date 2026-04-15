@@ -7,7 +7,7 @@ extends CharacterBody2D
 @export var shooting_range: float = 100000.0
 ## Enemy stops moving when this close to the player
 @export var stop_distance: float = 8.0
-@onready var shoot_point: Node2D = $ShootPoint
+@onready var shoot_point: Node2D = get_node_or_null("ShootPoint") as Node2D
 
 ## Damage dealt to player on contact
 @export var damage: float = 10.0
@@ -33,7 +33,7 @@ func _ready() -> void:
 
 
 func _shoot() -> void:
-	if player == null:
+	if player == null or shoot_point == null:
 		return
 	var projectile = PROJECTILE_SCENE.instantiate()
 	# Place it in the scene tree at the same level as the enemy
@@ -53,7 +53,8 @@ func _find_player() -> void:
 	animated_sprite.flip_h = to_player.x > 0
 
 	# Rotate ShootPoint to always aim at the player
-	shoot_point.look_at(player.global_position)
+	if shoot_point != null:
+		shoot_point.look_at(player.global_position)
 #
 	#if distance < shooting_range:
 		## In shooting range — stop and shoot
