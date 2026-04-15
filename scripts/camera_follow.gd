@@ -1,30 +1,30 @@
 extends Camera2D
-# -------------------------------------------------------------------------
-# CAMERA LOOK-AHEAD
-# Smoothly shifts the camera offset in the direction the player is moving
-# so the player can always see what's coming ahead of them.
-# -------------------------------------------------------------------------
 
 @export_group("Look-Ahead")
-@export var LOOKAHEAD_X: float = 160.0        # How far ahead to look horizontally (pixels)
-@export var LOOKAHEAD_Y_UP: float = 100.0     # How far ahead to look when jumping upward
-@export var LOOKAHEAD_Y_DOWN: float = 180.0   # How far ahead to look when falling (more room below)
-@export var LOOKAHEAD_SPEED: float = 2.5      # How quickly the camera smoothly slides to the target offset
+@export var LOOKAHEAD_X: float = 160.0
+@export var LOOKAHEAD_Y_UP: float = 100.0
+@export var LOOKAHEAD_Y_DOWN: float = 180.0
+@export var LOOKAHEAD_SPEED: float = 2.5
 
-# Velocity thresholds — avoids jitter from tiny accidental speeds
 @export_group("Thresholds")
-@export var X_VELOCITY_THRESHOLD: float = 80.0   # Min horizontal speed to trigger horizontal look-ahead
-@export var Y_VELOCITY_THRESHOLD: float = 80.0   # Min vertical speed to trigger vertical look-ahead
+@export var X_VELOCITY_THRESHOLD: float = 80.0
+@export var Y_VELOCITY_THRESHOLD: float = 80.0
 
-
-@export_group("Camera Shake")
-@export var HIT_SHAKE_STRENGTH: float = 14.0
+@export_group("Shake")
+@export var HIT_SHAKE_STRENGTH: float = 8.0
 @export var HIT_SHAKE_DURATION: float = 0.18
 @export var SHAKE_DECAY: float = 20.0
 
-var _target_offset: Vector2 = Vector2.ZERO
+var _look_ahead_offset: Vector2 = Vector2.ZERO
+var _smoothed_look_ahead_offset: Vector2 = Vector2.ZERO
+var _shake_offset: Vector2 = Vector2.ZERO
+var _shake_time_left: float = 0.0
+var _shake_strength: float = 0.0
 
-	
+func shake(strength: float = HIT_SHAKE_STRENGTH, duration: float = HIT_SHAKE_DURATION) -> void:
+	_shake_strength = max(_shake_strength, strength)
+	_shake_time_left = max(_shake_time_left, duration)
+
 func _physics_process(delta: float) -> void:
 	var player: CharacterBody2D = get_parent() as CharacterBody2D
 	if player == null:
@@ -32,23 +32,35 @@ func _physics_process(delta: float) -> void:
 
 	var vel: Vector2 = player.velocity
 
-	# ---- Horizontal look-ahead ----
 	if vel.x > X_VELOCITY_THRESHOLD:
-		_target_offset.x = LOOKAHEAD_X
+		_look_ahead_offset.x = LOOKAHEAD_X
 	elif vel.x < -X_VELOCITY_THRESHOLD:
-		_target_offset.x = -LOOKAHEAD_X
+		_look_ahead_offset.x = -LOOKAHEAD_X
 	else:
-		_target_offset.x = 0.0
+		_look_ahead_offset.x = 0.0
 
-	# ---- Vertical look-ahead ----
-	# Falling: look further down so the player can see what's below
-	# Jumping: look a bit up so the player can see platforms above
 	if vel.y > Y_VELOCITY_THRESHOLD:
-		_target_offset.y = LOOKAHEAD_Y_DOWN      # Falling — shift camera down
+		_look_ahead_offset.y = LOOKAHEAD_Y_DOWN
 	elif vel.y < -Y_VELOCITY_THRESHOLD:
-		_target_offset.y = -LOOKAHEAD_Y_UP       # Rising — shift camera up
+		_look_ahead_offset.y = -LOOKAHEAD_Y_UP
 	else:
-		_target_offset.y = 0.0
+		_look_ahead_offset.y = 0.0
 
-	# Smoothly lerp the camera offset toward the target
-	offset = offset.lerp(_target_offset, LOOKAHEAD_SPEED * delta)
+	var look_ahead_weight := minf(1.0, LOOKAHEAD_SPEED * delta)
+	_smoothed_look_ahead_offset = _smoothed_look_ahead_offset.lerp(_look_ahead_offset, look_ahead_weight)
+
+	_update_shake(delta)
+	offset = _smoothed_look_ahead_offset + _shake_offset
+
+func _update_shake(delta: float) -> void:
+	if _shake_time_left <= 0.0:
+		_shake_offset = Vector2.ZERO
+		_shake_strength = 0.0
+		return
+
+	_shake_time_left -= delta
+	_shake_strength = move_toward(_shake_strength, 0.0, SHAKE_DECAY * delta)
+	_shake_offset = Vector2(
+		randf_range(-_shake_strength, _shake_strength),
+		randf_range(-_shake_strength, _shake_strength)
+	)

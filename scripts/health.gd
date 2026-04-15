@@ -8,7 +8,7 @@ signal died
 
 @export_group("Health")
 @export var max_health: float = 100.0
-@export var start_health: float = -1.0 # -1 means start at max_health
+@export var start_health: float = -1.0
 
 @export_group("Death Handling")
 @export var auto_destroy_owner: bool = false

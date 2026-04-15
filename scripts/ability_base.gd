@@ -1,9 +1,6 @@
 extends Node
 class_name AbilityBase
 
-# Base class for all player abilities.
-# Every ability must override these three functions.
-
 func trigger(_args: Dictionary) -> Variant:
 	push_error("trigger() not implemented in: " + name)
 	return null

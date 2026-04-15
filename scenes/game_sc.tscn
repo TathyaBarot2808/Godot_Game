@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://c8wvjnp6dx5al" path="res://scenes/hud.tscn" id="3_hud"]
 [ext_resource type="Script" uid="uid://db0ibg2vxor83" path="res://scripts/game.gd" id="4_game"]
 [ext_resource type="PackedScene" uid="uid://dcvnx7nq3eiaw" path="res://scenes/enemy_sc.tscn" id="5_3l2eu"]
-[ext_resource type="Script" path="res://scripts/camera_follow.gd" id="5_camera"]
+[ext_resource type="Script" uid="uid://dm74kwdaimbxw" path="res://scripts/camera_follow.gd" id="5_camera"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cn2eb"]
 texture = ExtResource("2_iynk6")
@@ -213,7 +213,7 @@ texture = ExtResource("2_iynk6")
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_cn2eb")
 
-[node name="Scene1" type="Node2D" unique_id=830306056]
+[node name="MainGame" type="Node2D" unique_id=830306056]
 script = ExtResource("4_game")
 
 [node name="Player" parent="." unique_id=167515670 instance=ExtResource("2_fdsry")]

@@ -62,10 +62,14 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_44pq4"]
 size = Vector2(15, 13)
 
+[sub_resource type="Gradient" id="Gradient_m0j0s"]
+offsets = PackedFloat32Array(0, 0.75, 1)
+colors = PackedColorArray(0.9843137, 0.6509804, 0.5568628, 1, 0.8784314, 0.1882353, 0.23529412, 1, 0.35686275, 0.05882353, 0.08235294, 0)
+
 [node name="EnemySc" type="CharacterBody2D" unique_id=659245497]
 scale = Vector2(4, 4)
 collision_layer = 4
-collision_mask = 11
+collision_mask = 9
 script = ExtResource("3_enemy")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1675961808]
@@ -78,8 +82,23 @@ position = Vector2(-1.25, 5.25)
 
 [node name="HealthComponent" parent="." unique_id=1365412678 instance=ExtResource("2_o0x7t")]
 max_health = 30.0
-auto_destroy_owner = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1877756592]
 position = Vector2(-0.5, 5.5)
 shape = SubResource("RectangleShape2D_44pq4")
+
+[node name="HitParticles" type="CPUParticles2D" parent="." unique_id=1797756592]
+position = Vector2(0, 4)
+emitting = false
+amount = 18
+lifetime = 0.35
+one_shot = true
+explosiveness = 1.0
+randomness = 0.85
+spread = 180.0
+gravity = Vector2(0, 180)
+initial_velocity_min = 35.0
+initial_velocity_max = 85.0
+scale_amount_min = 1.2
+scale_amount_max = 2.0
+color_ramp = SubResource("Gradient_m0j0s")

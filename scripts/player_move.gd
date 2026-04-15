@@ -1,12 +1,7 @@
 extends CharacterBody2D
 
-# Player controller: movement, gravity, jump, abilities, and shoot effect sync.
-
-# -----------------------------------------------------------------------------
-# Editor Settings
-# -----------------------------------------------------------------------------
 @export_group("Movement")
-@export var SPEED: float = 600.0
+@export var SPEED: float = 400.0
 @export var JUMP_VELOCITY: float = -1000.0
 @export var ACCELERATION: float = 3000.0
 @export var DECELERATION: float = 2500.0
@@ -39,9 +34,11 @@ extends CharacterBody2D
 @export var CORNER_CORRECTION_AMOUNT: float = 4.0
 @export var ENABLE_CORNER_CORRECTION: bool = false
 
-# -----------------------------------------------------------------------------
-# Runtime State
-# -----------------------------------------------------------------------------
+@export_group("Animation")
+@export var WALK_ANIMATION_BASE_SPEED: float = 240.0
+@export var WALK_ANIMATION_MIN_SCALE: float = 0.85
+@export var WALK_ANIMATION_MAX_SCALE: float = 2.2
+
 var jump_buffer_timer: float = 0.0
 var coyote_timer: float = 0.0
 var is_dashing: bool = false
@@ -50,9 +47,6 @@ var is_wall_sliding: bool = false
 var is_shooting_action_active: bool = false
 var stored_shoot_direction: Vector2 = Vector2.ZERO
 
-# -----------------------------------------------------------------------------
-# Node References
-# -----------------------------------------------------------------------------
 @onready var abilities: AbilitiesManager = $AbilitiesManager
 @onready var loadout: LoadoutManager = $AbilitiesManager/LoadoutManager
 
@@ -67,9 +61,6 @@ var stored_shoot_direction: Vector2 = Vector2.ZERO
 @onready var _dash_comp: Node = $AbilitiesManager/dash
 @onready var _recoil: Node = $AbilitiesManager/recoil
 
-# -----------------------------------------------------------------------------
-# Constants / Data
-# -----------------------------------------------------------------------------
 const PROJECTILE_SCENE := preload("res://scenes/player_projectile_sc.tscn")
 const FIRE_POINT_BASE_Y: float = -5.0
 const SHOOT_EFFECT_BASE_Y: float = 3.0
@@ -82,9 +73,6 @@ var chest_y_offsets: Dictionary = {
 	"Dash": [0, 0, 0, 0, 0]
 }
 
-# -----------------------------------------------------------------------------
-# Lifecycle
-# -----------------------------------------------------------------------------
 func _ready() -> void:
 	add_to_group("player")
 	if _dash_comp:
@@ -115,9 +103,6 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-# -----------------------------------------------------------------------------
-# Innate Ability Handling
-# -----------------------------------------------------------------------------
 func _handle_innate_shoot() -> void:
 	if not Input.is_action_just_pressed("shoot"):
 		return
@@ -131,9 +116,6 @@ func _handle_innate_shoot() -> void:
 	if started == true:
 		mana.spend(mana.shoot_cost)
 
-# ------------------------d-----------------------------------------------------
-# Loadout Ability Handling
-# -----------------------------------------------------------------------------
 func _handle_slot_switch() -> void:
 	if Input.is_action_just_pressed("slot_1"):
 		loadout.set_active_slot(0)
@@ -206,16 +188,12 @@ func _on_dash_started() -> void:
 	animated_sprite.play("Dash")
 
 func _on_dash_ended() -> void:
-	# Dash movement ends here; animation finish drives dash-state release.
 	pass
 
 func _on_player_damaged(amount: float, current: float, max_value: float) -> void:
 	if camera_follow != null and camera_follow.has_method("shake"):
 		camera_follow.shake()
 
-# -----------------------------------------------------------------------------
-# Movement / Physics
-# -----------------------------------------------------------------------------
 func _tick_coyote(delta: float) -> void:
 	if is_on_floor():
 		coyote_timer = COYOTE_TIME
@@ -303,10 +281,10 @@ func _is_pressing_towards_wall() -> bool:
 
 	var wall_normal := get_wall_normal()
 	if wall_normal.x > 0.1:
-		# Wall is on the player's left side.
+
 		return input_x < 0.0
 	if wall_normal.x < -0.1:
-		# Wall is on the player's right side.
+
 		return input_x > 0.0
 	return false
 
@@ -323,9 +301,6 @@ func _handle_corner_correction() -> void:
 	if not test_move(global_transform, Vector2(nudge, 0.0)):
 		global_position.x += nudge
 
-# -----------------------------------------------------------------------------
-# Animation / Visual Sync
-# -----------------------------------------------------------------------------
 func _update_animation_and_sync() -> void:
 	if animated_sprite.animation == "Dash":
 		if animated_sprite.is_playing():
@@ -333,10 +308,15 @@ func _update_animation_and_sync() -> void:
 		is_dashing = false
 
 	if not is_on_floor():
+		animated_sprite.speed_scale = 1.0
 		animated_sprite.play("Jump" if velocity.y < 0 else "Fall")
 	elif abs(velocity.x) > 0.1:
 		animated_sprite.play("Walk")
+		var walk_speed := absf(velocity.x)
+		var walk_scale := walk_speed / maxf(WALK_ANIMATION_BASE_SPEED, 1.0)
+		animated_sprite.speed_scale = clampf(walk_scale, WALK_ANIMATION_MIN_SCALE, WALK_ANIMATION_MAX_SCALE)
 	else:
+		animated_sprite.speed_scale = 1.0
 		animated_sprite.play("Idle")
 
 	var anim := animated_sprite.animation
@@ -349,9 +329,6 @@ func _update_animation_and_sync() -> void:
 	if shoot_effect:
 		shoot_effect.position.y = SHOOT_EFFECT_BASE_Y + y_off
 
-# -----------------------------------------------------------------------------
-# Shoot Effect Hooks
-# -----------------------------------------------------------------------------
 func _on_shoot_effect_frame_changed() -> void:
 	if shoot_effect.animation == "default" and shoot_effect.frame == 4:
 		_fire_projectile()
@@ -359,8 +336,6 @@ func _on_shoot_effect_frame_changed() -> void:
 	elif shoot_effect.frame == 7:
 		shoot_effect.hide()
 		shoot_effect.stop()
-
-	 
 
 func _on_shoot_effect_animation_finished() -> void:
 	shoot_effect.hide()

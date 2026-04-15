@@ -4,13 +4,17 @@ extends Area2D
 
 var direction: Vector2 = Vector2.RIGHT
 
+func _ready() -> void:
+	add_to_group("enemy_projectile")
 
 func _physics_process(delta: float) -> void:
 	position += direction * speed * delta
 
 func _on_body_entered(body: Node2D) -> void:
-
-	if body.is_in_group("enemy1"):
+	if body.is_in_group("enemy"):
+		return
+	if not body.is_in_group("player"):
+		queue_free()
 		return
 
 	var health := _find_health_component(body)

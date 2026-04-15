@@ -21,12 +21,9 @@ func _physics_process(delta: float) -> void:
 	if _cooldown_timer > 0:
 		_cooldown_timer -= delta
 
-# ── AbilityBase interface ─────────────────────────────────────────────────────
-
 func can_use() -> bool:
 	return not _is_dashing and _cooldown_timer <= 0.0
 
-# args: { "direction": Vector2 }  — normalized 8-directional vector from WASD
 func trigger(args: Dictionary) -> Variant:
 	var dir: Vector2 = args.get("direction", Vector2.RIGHT)
 	if dir == Vector2.ZERO:
