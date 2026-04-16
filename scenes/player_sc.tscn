@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://s45plqefiv7" path="res://scripts/shoot_component.gd" id="13_shoot"]
 [ext_resource type="Script" uid="uid://cjkt10dyt51sx" path="res://scripts/recoil_component.gd" id="15_recoil"]
 [ext_resource type="PackedScene" uid="uid://075khp826fvb" path="res://scenes/health_sc.tscn" id="16_health"]
+[ext_resource type="Script" path="res://scripts/player_shoot_controller.gd" id="17_shoot_controller"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_acmti"]
 size = Vector2(29.5, 117)
@@ -372,6 +373,9 @@ script = ExtResource("15_recoil")
 
 [node name="walljump" type="Node" parent="AbilitiesManager" unique_id=1815538869]
 script = ExtResource("9_vaact")
+
+[node name="ShootController" type="Node" parent="." unique_id=238434009]
+script = ExtResource("17_shoot_controller")
 
 [node name="FirePoint" type="Node2D" parent="." unique_id=238434010]
 position = Vector2(14.855, -3.8)

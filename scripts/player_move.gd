@@ -20,11 +20,6 @@ extends CharacterBody2D
 @export var MAX_FALL_SPEED: float = 2000.0
 @export var FALL_GRAVITY_MULTIPLIER: float = 5.0
 
-@export_group("Dash")
-@export var DASH_SPEED: float = 1800.0
-@export var DASH_DURATION: float = 0.12
-@export var DASH_COOLDOWN: float = 0.5
-
 @export_group("Apex Modifiers")
 @export var APEX_THRESHOLD: float = 15.0
 @export var APEX_GRAVITY_MULTIPLIER: float = 0.6
@@ -51,9 +46,6 @@ var is_dashing: bool = false
 var is_wall_sliding: bool = false
 var _hit_flash_tween: Tween = null
 
-var is_shooting_action_active: bool = false
-var stored_shoot_direction: Vector2 = Vector2.ZERO
-
 @onready var abilities: AbilitiesManager = $AbilitiesManager
 @onready var loadout: LoadoutManager = $AbilitiesManager/LoadoutManager
 
@@ -65,13 +57,9 @@ var stored_shoot_direction: Vector2 = Vector2.ZERO
 @onready var camera_follow: Camera2D = $Camera2D
 @onready var hit_particles: CPUParticles2D = $HitParticles
 @onready var fire_point: Node2D = $FirePoint
-@onready var shoot_effect: AnimatedSprite2D = $ShootEffectSprite
+@onready var shoot_controller: Node = $ShootController
 @onready var _dash_comp: Node = $AbilitiesManager/dash
 @onready var _recoil: Node = $AbilitiesManager/recoil
-
-const PROJECTILE_SCENE := preload("res://scenes/player_projectile_sc.tscn")
-const FIRE_POINT_BASE_Y: float = -5.0
-const SHOOT_EFFECT_BASE_Y: float = 3.0
 
 var chest_y_offsets: Dictionary = {
 	"Idle": [0, 1, 4, 5, 4, 1, 0],
@@ -81,6 +69,10 @@ var chest_y_offsets: Dictionary = {
 	"Dash": [0, 0, 0, 0, 0]
 }
 
+var is_shooting_action_active: bool:
+	get:
+		return shoot_controller != null and shoot_controller.is_shooting()
+
 func _ready() -> void:
 	add_to_group("player")
 	if _dash_comp:
@@ -88,13 +80,6 @@ func _ready() -> void:
 		_dash_comp.dash_ended.connect(_on_dash_ended)
 	if health != null:
 		health.damaged.connect(_on_player_damaged)
-
-	if shoot_effect != null:
-		shoot_effect.frame_changed.connect(_on_shoot_effect_frame_changed)
-		shoot_effect.animation_finished.connect(_on_shoot_effect_animation_finished)
-		shoot_effect.hide()
-	else:
-		push_error("CRITICAL: ShootEffectSprite not found!")
 
 func _physics_process(delta: float) -> void:
 	_tick_coyote(delta)
@@ -120,12 +105,6 @@ func _handle_innate_shoot() -> void:
 		return
 
 	var direction := (get_global_mouse_position() - fire_point.global_position).normalized()
-	#if direction.x < 0:
-		#animated_sprite.flip_h = true
-	#elif direction.x > 0:
-		#animated_sprite.flip_h = false
-
-	
 	var started: Variant = abilities.execute("shoot", {"direction": direction})
 	if started == true:
 		mana.spend(mana.shoot_cost)
@@ -278,14 +257,8 @@ func _handle_movement(delta: float) -> void:
 		var decel := DECELERATION if is_on_floor() else AIR_DECELERATION
 		velocity.x = move_toward(velocity.x, 0.0, decel * delta)
 
-	if animated_sprite.flip_h:
-		fire_point.position.x = -abs(fire_point.position.x)
-		if shoot_effect:
-			shoot_effect.flip_h = true
-	else:
-		fire_point.position.x = abs(fire_point.position.x)
-		if shoot_effect:
-			shoot_effect.flip_h = false
+	if shoot_controller != null:
+		shoot_controller.sync_facing(animated_sprite.flip_h)
 
 func _should_wall_slide() -> bool:
 	if is_on_floor():
@@ -347,46 +320,10 @@ func _update_animation_and_sync() -> void:
 	if chest_y_offsets.has(anim) and frame < chest_y_offsets[anim].size():
 		y_off = float(chest_y_offsets[anim][frame])
 
-	fire_point.position.y = FIRE_POINT_BASE_Y + y_off
-	if shoot_effect:
-		shoot_effect.position.y = SHOOT_EFFECT_BASE_Y + y_off
-
-func _on_shoot_effect_frame_changed() -> void:
-	if shoot_effect.animation == "default" and shoot_effect.frame == 4:
-		_fire_projectile()
-		is_shooting_action_active = false
-	elif shoot_effect.frame == 7:
-		shoot_effect.hide()
-		shoot_effect.stop()
-
-func _on_shoot_effect_animation_finished() -> void:
-	shoot_effect.hide()
-	is_shooting_action_active = false
+	if shoot_controller != null:
+		shoot_controller.sync_height_offset(y_off)
 
 func start_shooting(direction: Vector2) -> bool:
-	if is_shooting_action_active:
+	if shoot_controller == null:
 		return false
-
-	if direction == Vector2.ZERO:
-		direction = Vector2.RIGHT if not animated_sprite.flip_h else Vector2.LEFT
-	stored_shoot_direction = direction.normalized()
-
-	if shoot_effect == null:
-		return false
-
-	is_shooting_action_active = true
-	shoot_effect.show()
-	shoot_effect.play("default")
-	shoot_effect.set_frame_and_progress(0, 0.0)
-	return true
-
-func _fire_projectile() -> void:
-	var proj = PROJECTILE_SCENE.instantiate()
-	var dir = stored_shoot_direction
-	if dir == Vector2.ZERO:
-		dir = Vector2.RIGHT if not animated_sprite.flip_h else Vector2.LEFT
-
-	proj.global_position = fire_point.global_position
-	proj.direction = dir
-	proj.rotation = dir.angle()
-	get_tree().current_scene.add_child(proj)
+	return shoot_controller.request_shot(direction, animated_sprite.flip_h)

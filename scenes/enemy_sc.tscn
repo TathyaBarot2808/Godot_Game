@@ -2,7 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://075khp826fvb" path="res://scenes/health_sc.tscn" id="2_o0x7t"]
 [ext_resource type="Texture2D" uid="uid://blgjoocpb80bj" path="res://assets/Flying_Enemy_Sprite.png" id="2_qwexe"]
-[ext_resource type="Script" uid="uid://bfit7c7p704nw" path="res://scripts/enemy.gd" id="3_enemy"]
+[ext_resource type="Script" path="res://scripts/enemy_base.gd" id="3_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_projectile_sc.tscn" id="4_enemy_projectile"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ngm7w"]
 atlas = ExtResource("2_qwexe")
@@ -71,6 +72,7 @@ scale = Vector2(4, 4)
 collision_layer = 4
 collision_mask = 9
 script = ExtResource("3_enemy")
+projectile_scene = ExtResource("4_enemy_projectile")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1675961808]
 sprite_frames = SubResource("SpriteFrames_uylc1")
