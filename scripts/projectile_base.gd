@@ -24,6 +24,17 @@ func _ready() -> void:
 	if not projectile_group_name.is_empty():
 		add_to_group(projectile_group_name)
 	_update_rotation()
+	# Start the animation from frame 0 on every spawned instance
+	var anim_sprite := _find_animated_sprite()
+	if anim_sprite != null:
+		anim_sprite.frame = 0
+		anim_sprite.play()
+
+func _find_animated_sprite() -> AnimatedSprite2D:
+	for child in get_children():
+		if child is AnimatedSprite2D:
+			return child as AnimatedSprite2D
+	return null
 
 func _physics_process(delta: float) -> void:
 	position += direction * speed * delta

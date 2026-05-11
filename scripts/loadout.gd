@@ -56,4 +56,3 @@ func _get_abilities_manager() -> AbilitiesManager:
 		push_error("LoadoutManager: parent must be AbilitiesManager")
 		return null
 	return parent as AbilitiesManager
-

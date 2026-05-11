@@ -2,12 +2,32 @@
 
 [ext_resource type="PackedScene" uid="uid://075khp826fvb" path="res://scenes/health_sc.tscn" id="2_o0x7t"]
 [ext_resource type="Texture2D" uid="uid://blgjoocpb80bj" path="res://assets/Flying_Enemy_Sprite.png" id="2_qwexe"]
-[ext_resource type="Script" path="res://scripts/enemy_base.gd" id="3_enemy"]
-[ext_resource type="PackedScene" path="res://scenes/enemy_projectile_sc.tscn" id="4_enemy_projectile"]
+[ext_resource type="Script" uid="uid://cttq8vq8bkwej" path="res://scripts/enemy_base.gd" id="3_enemy"]
+[ext_resource type="PackedScene" uid="uid://d3m3lnrv0gg3g" path="res://scenes/enemy_projectile_sc.tscn" id="4_enemy_projectile"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ngm7w"]
 atlas = ExtResource("2_qwexe")
 region = Rect2(64, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fg7kq"]
+atlas = ExtResource("2_qwexe")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3bqr2"]
+atlas = ExtResource("2_qwexe")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bjsaf"]
+atlas = ExtResource("2_qwexe")
+region = Rect2(96, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2td0t"]
+atlas = ExtResource("2_qwexe")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aalry"]
+atlas = ExtResource("2_qwexe")
+region = Rect2(32, 64, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qwexe"]
 atlas = ExtResource("2_qwexe")
@@ -37,6 +57,26 @@ animations = [{
 }],
 "loop": false,
 "name": &"Die",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 0.3,
+"texture": SubResource("AtlasTexture_fg7kq")
+}, {
+"duration": 0.3,
+"texture": SubResource("AtlasTexture_3bqr2")
+}, {
+"duration": 0.3,
+"texture": SubResource("AtlasTexture_bjsaf")
+}, {
+"duration": 0.3,
+"texture": SubResource("AtlasTexture_2td0t")
+}, {
+"duration": 0.3,
+"texture": SubResource("AtlasTexture_aalry")
+}],
+"loop": true,
+"name": &"Shoot",
 "speed": 5.0
 }, {
 "frames": [{
@@ -76,8 +116,9 @@ projectile_scene = ExtResource("4_enemy_projectile")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1675961808]
 sprite_frames = SubResource("SpriteFrames_uylc1")
-animation = &"idle"
+animation = &"Shoot"
 autoplay = "idle"
+frame_progress = 0.9143532
 
 [node name="ShootPoint" type="Marker2D" parent="." unique_id=1514472201]
 position = Vector2(-1.25, 5.25)

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://d3m3lnrv0gg3g"]
 
 [ext_resource type="Texture2D" uid="uid://bmdl8qolckya4" path="res://assets/Enemy_Projectile_Sprite.png" id="1_hi3uv"]
-[ext_resource type="Script" path="res://scripts/projectile_base.gd" id="1_yodc8"]
+[ext_resource type="Script" uid="uid://c0xm2rlcdjyi8" path="res://scripts/projectile_base.gd" id="1_yodc8"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yodc8"]
 atlas = ExtResource("1_hi3uv")
@@ -38,28 +38,28 @@ region = Rect2(224, 0, 32, 32)
 [sub_resource type="SpriteFrames" id="SpriteFrames_sg2fn"]
 animations = [{
 "frames": [{
-"duration": 0.4,
+"duration": 0.3,
 "texture": SubResource("AtlasTexture_yodc8")
 }, {
-"duration": 0.4,
+"duration": 0.3,
 "texture": SubResource("AtlasTexture_bbkip")
 }, {
-"duration": 0.4,
+"duration": 0.3,
 "texture": SubResource("AtlasTexture_j5g8c")
 }, {
-"duration": 0.4,
+"duration": 0.3,
 "texture": SubResource("AtlasTexture_7f6re")
 }, {
-"duration": 0.4,
+"duration": 0.3,
 "texture": SubResource("AtlasTexture_m1kpb")
 }, {
-"duration": 0.4,
+"duration": 0.3,
 "texture": SubResource("AtlasTexture_1e6ei")
 }, {
-"duration": 0.4,
+"duration": 0.3,
 "texture": SubResource("AtlasTexture_ilx3q")
 }, {
-"duration": 0.4,
+"duration": 0.3,
 "texture": SubResource("AtlasTexture_tcgu3")
 }],
 "loop": false,
@@ -74,7 +74,7 @@ size = Vector2(20, 8.75)
 offsets = PackedFloat32Array(0.5, 0.8596059)
 colors = PackedColorArray(0.9137255, 0.24705882, 0.34901962, 1, 1, 1, 1, 1)
 
-[node name="Area2D" type="Area2D" unique_id=589445869]
+[node name="Area2D2" type="Area2D" unique_id=589445869]
 scale = Vector2(1.75, 1.75)
 collision_layer = 16
 collision_mask = 3
@@ -86,6 +86,7 @@ rotation_offset = 3.1415927
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1943522478]
 position = Vector2(-1.1428571, 0)
+scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_sg2fn")
 frame = 7
 frame_progress = 1.0

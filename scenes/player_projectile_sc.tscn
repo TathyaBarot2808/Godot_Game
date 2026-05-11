@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b77p8ccb8vle3"]
 
-[ext_resource type="Script" path="res://scripts/projectile_base.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://c0xm2rlcdjyi8" path="res://scripts/projectile_base.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://dvtq2rt5yypwc" path="res://assets/Player_Projectile_Sprite.png" id="1_xshyn"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_umcbn"]
@@ -104,11 +104,12 @@ script = ExtResource("1_script")
 target_groups = PackedStringArray("enemy")
 ignored_groups = PackedStringArray("player")
 projectile_group_name = "player_projectile"
+rotation_offset = 3.1415927
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1319218041]
+scale = Vector2(1.75, 1.75)
 sprite_frames = SubResource("SpriteFrames_qfl01")
 animation = &"Fired"
-frame_progress = 0.88692874
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1589747999]
 position = Vector2(-7.6, 0)
